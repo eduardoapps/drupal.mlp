@@ -1,0 +1,5 @@
+name = CHELIK SS
+description = One possible implementation of a Secret Santa with books as gifts
+core = 7.x
+stylesheets[all][] = chss.css
+;dependencies[] = fboauth

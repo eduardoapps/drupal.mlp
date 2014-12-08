@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="responsive jquery carousel plugin">
+	<meta name="author" content="flGravity">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<!-- Mobile Specific Metas -->
+	<script type="text/javascript">
+		var browser			= navigator.userAgent;
+		var browserRegex	= /(Android|BlackBerry|IEMobile|Nokia|iP(ad|hone|od)|Opera M(obi|ini))/;
+		var isMobile		= false;
+		if(browser.match(browserRegex)) {
+			isMobile			= true;
+			addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+			function hideURLbar(){
+				window.scrollTo(0,1);
+			}
+		}
+	</script>
+	
+	<!-- Google Web Fonts -->
+	<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+		
+	<!-- CSS -->
+	<link rel="stylesheet" href="css/everslider.css">
+	<link rel="stylesheet" href="css/everslider-custom.css">
+	
+	<!-- JavaScript -->
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+	<script type="text/javascript" src="js/jquery.everslider.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+			/* Image slider */
+			$('#image_slider').everslider({
+				mode: 'normal',
+				maxVisible: 1,
+				slideEasing: 'easeInOutQuart',
+				slideDuration: 500
+			});
+			
+			/* Featured slider	*/		
+			$('#featured_slider').everslider({
+				mode: 'circular',
+				itemKeepRatio: false,
+				navigation: false,
+				mouseWheel: true
+			});
+			
+			/* Fullwidth slider */
+			$('#fullwidth_slider').everslider({
+				mode: 'carousel',
+				moveSlides: 1,
+				itemHeight: 300,
+				itemWidth: 150,
+				slideEasing: 'easeInOutCubic',
+				slideDuration: 700,
+				navigation: true,
+				keyboard: true,
+				nextNav: '<span class="alt-arrow">Next</span>',
+				prevNav: '<span class="alt-arrow">Next</span>',
+				ticker: false,
+				tickerAutoStart: false,
+				tickerHover: true,
+				tickerTimeout: 2000
+			});
+			
+			
+		});
+	</script>
+</head>
+<body>
+	
+	
+	<!-- end row -->
+	
+	<div class="row base">
+	
+		<!-- fullwidth slider -->
+		<div class="grid_7">
+			<div id="fullwidth_slider" class="everslider fullwidth-slider">
+				<ul class="es-slides">
+					<li>
+						<img src="pictures/pic1.jpg" alt="Example">
+						<div class="fullwidth-title">
+							<a href="#"><img src="images/bullet.png" style="height:10px; width:10px; margin-right:5px;" />Learning from
+							<img src="images/share.png" style="height:10px; width:10px; right:-40px; position:relative;" />
+							</br>the voices in my head
+							</a>
+						</div>
+					</li>
+					<li>
+						<img src="pictures/pic2.jpg" alt="Example">
+						<div class="fullwidth-title">
+							<a href="#"><img src="images/bullet.png" style="height:10px; width:10px; margin-right:5px;" />Rewiring our
+							<img src="images/share.png" style="height:10px; width:10px; right:-40px; position:relative;" />
+							</br>morality
+							</a>
+						</div>
+					</li>
+					<li>
+						<img src="pictures/pic3.jpg" alt="Example">
+						<div class="fullwidth-title">
+							<a href="#"><img src="images/bullet.png" style="height:10px; width:10px; margin-right:5px;" />Super cells
+							<img src="images/share.png" style="height:10px; width:10px; right:-40px; position:relative;" />
+							</a>
+						</div>
+					</li>
+					<li>
+						<img src="pictures/pic4.jpg" alt="Example">
+						<div class="fullwidth-title">
+							<a href="#"><img src="images/bullet.png" style="height:10px; width:10px; margin-right:5px;" />Would you say?
+							<img src="images/share.png" style="height:10px; width:10px; right:-30px; position:relative;" />
+							</a>
+						</div>
+					</li>
+					<li>
+						<img src="pictures/pic5.jpg" alt="Example">
+						<div class="fullwidth-title">
+							<a href="#"><img src="images/bullet.png" style="height:10px; width:10px; margin-right:5px;" />Callbacks and
+							<img src="images/share.png" style="height:10px; width:10px; right:-40px; position:relative;" />
+							</br>Custom Events
+							</a>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<!-- fullwidth slider -->
+		
+	</div>
+		
+	<!-- end row -->
+	
+		
+	<!-- end row -->
+		 
+	
+	<!-- Scripts for preview -->
+	<script type="text/javascript" src="js/respond.min.js"></script>
+	<script type="text/javascript" src="js/jquery.scrollUp.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+		    $.scrollUp({animation: 'slide'});
+		    $('a[href="#"]').click(function(){ return false; });
+		});
+	</script>
+</body>
+</html>

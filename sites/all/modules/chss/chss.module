@@ -1,0 +1,1171 @@
+<?php
+function chss_dali_e_organizator () {
+	/* Is he a group organizer for at least one group? */
+	global	$user;
+
+	if (!$user->uid)
+		return (false);
+
+	return (db_query ('select * from {chss_group} where organizer_user_id=:uid', array (':uid' => $user->uid))->rowCount ());
+}
+
+function _chss_presmetaj_preporaka ($uid) {
+	/* Calculates the recommendation based on algorithm that matches the most common features of the person and the book. */
+	/* XXX: Do we disregard the categories? */
+	$qa = chss_daj_qa_za_user ($uid);
+
+	if (!$qa) {
+		/* This really shouldn't happen.
+		 * NOTREACHED? */
+		return ('');
+	}
+
+	if ($qa['odgovor_5'] == 1)
+		$max_cena = 199;
+
+	else
+		$max_cena = 10000;	/* Just the highest, any number >=500 will do I guess..*/
+
+	$q = 'select book_id from chss_book_db where ' .
+	'(book_id) in (select book_id from {chss_book_db_answers} where question_id = 1 and answer = :odgovor_1) and ' .
+	'(book_id) in (select book_id from {chss_book_db_answers} where question_id = 2 and answer = :odgovor_4) and ' .
+	'(price <= :max_cena) and ' .
+	'((genre = 0) or (genre = :odgovor_3)) and ' .
+	'(age_min <= :odgovor_2) and (age_max >= :odgovor_2) ' .
+	'limit 5';
+
+	/* XXX: If there are less than 5 books matching the criteria, we can try relaxing one parameter by the next. */
+
+	$iz = db_query ($q, array (
+		':odgovor_1' => $qa['odgovor_1'],
+		':odgovor_4' => $qa['odgovor_4'],
+		':odgovor_2' => $qa['odgovor_2'],
+		':max_cena' => $max_cena,
+		':odgovor_3' => $qa['odgovor_3']
+	));
+
+	$book_array = array ();
+
+	while ($arr = $iz->fetchAssoc()) {
+		array_push ($book_array, chss_zemi_kniga ($arr['book_id']));
+	}
+
+	return ($book_array);
+}
+
+function _chss_ima_li_odgovoreno () {
+	/* Checks if he had filled the questionnaire already. */
+	/* XXX: Needs to have a 'preferred' gift somehow incorporated */
+
+	global	$user;
+
+	if (!$user->uid)
+		return (false);
+
+	$iz = db_query ('select * from {chss_anketa} where user_id=:uid', array (':uid' => $user->uid))->fetchAssoc ();
+
+	if (!$iz) {
+		return (false);
+	}
+
+	else if ($iz['preferred']) {
+		/* He chose another gift, not the books. */
+		return (2);
+	}
+
+
+	return (1);
+}
+
+function chss_daj_qa_za_user ($uid) {
+	/* Returns the answers from the questionnaire. */
+
+	return (db_query ('select * from {chss_anketa} where user_id=:uid', array (':uid' => $uid))->fetchAssoc ());
+}
+
+function chss_vnesi_anketa ($uid, $odg_1, $odg_2, $odg_3, $odg_4, $odg_5, $preferred) {
+	/* Save the answers. */
+	global	$user;
+
+	if (_chss_ima_li_odgovoreno ())
+		return;
+
+	db_insert ('chss_anketa')
+	->fields (array (
+		'user_id' => $uid,
+		'odgovor_1' => $odg_1,
+		'odgovor_2' => $odg_2,
+		'odgovor_3' => $odg_3,
+		'odgovor_4' => $odg_4,
+		'odgovor_5' => $odg_5,
+		'preferred' => $preferred,
+	))
+	->execute ();
+
+	/* Publish on his timeline that he answered this questionnaire. */
+	chss_post_to_fb_timeline ($user->uid, 'CH Secret Santa', 'Your Secret Santa is here', 'You have successfully answered the questionnaire');
+}
+
+function chss_menu () {
+	/* We control the ss/whatever requests. */
+
+	$items ['ss/%'] = array (
+		'page callback' => '_chss_strana',
+		'page arguments' => array (1), 
+		'access arguments' => array('access content'),
+	);
+
+	return ($items);
+}
+
+function chss_page_alter (&$page) {
+	/* Just redirect to ss/homepage directly. */
+	/* The theme takes over, etc. */
+	if (drupal_is_front_page ())
+		drupal_goto ('ss/homepage');
+}
+
+function _chss_strana ($arg) {
+	/* XXX: Do the processing at the template side? */
+	$content = array (
+		'content' => array (
+			'#markup' => _chss_content ($arg),
+			'#prefix' => '<div class="chss_ss_' . $arg . '">',
+			'#suffix' => '</div>'
+		)
+	);
+
+	return ($content);
+}
+
+function
+chss_generate_crud_fields () {
+	$iz = db_query ('select * from {chss_book_db}');
+	$str = '';
+
+	while ($arr = $iz->fetchAssoc ()) {
+		$str .= '<form action="' . url ("ss/crud") . '" method="post">';
+		$book_id = $arr ['book_id'];
+		$title = $arr ['title'];
+		$author = $arr ['author'];
+		$isbn = $arr ['isbn'];
+
+		$str .= 
+			"<input type=\"hidden\" name=\"shto\" value=\"izmeni\"/>" .
+			"Book id: <input type=\"text\" readonly name=\"book_id\" value=\"$book_id\" />" .
+			"Title: <input type=\"text\" readonly name=\"title\" value=\"$title\" />" .
+			"ISBN: <input type=\"text\" readonly name=\"isbn\" value=\"$isbn\" />" .
+			"<input type=\"Submit\" value=\"Change details for this book\" /><br><hr>";
+
+		$str .= "</form>";
+
+		$str .= '<form action="' . url ("ss/crud") . '" method="post">
+			<input type="hidden" name="shto" value="brishi"/>
+			<input type="hidden" name="book_id" value="' . $book_id . '"/>
+			<input type="Submit" value="Delete this book"></form>';
+	}
+
+	$str .= "<br>";
+
+	$str .= '
+	<form action="' . url ("ss/crud") . '" method="post">
+	<input type="hidden" name="shto" value="dodadi" />
+	<input type="Submit" value="Add new book here." />
+	</form>';
+
+	return ($str);
+}
+
+function
+chss_zemi_kniga ($book_id) {
+	if (!is_numeric ($book_id))
+		return;
+
+	$book = db_query ("select * from {chss_book_db} where book_id=:book_id", array (':book_id' => $book_id))->fetchAssoc ();
+	$res = db_query ("select * from {chss_book_db_answers} where book_id=:book_id", array ('book_id' => $book_id));
+
+	while ($iz = $res->fetchAssoc ()) {
+		$par = 'prashanje_' . $iz ['question_id'];
+		$book [$par][$iz ['answer']] = true;
+	}
+
+	return ($book);
+}
+
+function
+chss_crud_delete ($book_id) {
+	/* Deletes the book entry $book_id */
+	db_query ('delete from {chss_book_db} where book_id=:book_id', array ('book_id' => $book_id));
+
+	return ('The book was successfully deleted. Go <a href="' . url ('ss/crud') . '"> back </a>');
+}
+
+function
+chss_crud_update ($book) {
+	/* Updates the database with the data stored in $book. This is directly from the clients' browser. */
+
+	if (!is_numeric ($book ['age_min']) ||
+		!is_numeric ($book ['age_max']) ||
+		!is_numeric ($book ['genre']) ||
+		!is_numeric ($book ['price']))
+		return;
+
+	
+	if ($book ['age_min'] > $book ['age_max'])
+		return;
+
+	db_update ('chss_book_db')
+	-> fields ( array (
+		'responsible' => $book ['responsible'],
+		'title' => $book ['title'],
+		'author' => $book ['author'],
+		'isbn' => $book ['isbn'],
+		'age_min' => $book ['age_min'],
+		'age_max' => $book ['age_max'],
+		'genre' => $book ['genre'],
+		'category' => $book ['category'],
+		'codewords' => $book ['codewords'],
+		'phrase' => $book ['phrase'],
+		'url' => $book ['url'],
+		'price' => $book ['price']
+	))
+	->where ('book_id = :book_id',  array (':book_id' => $book ['book_id']))
+	-> execute ();
+
+	db_query ('delete from {chss_book_db_answers} where book_id=:book_id', array (':book_id' => $book['book_id']));
+
+	if (isset ($book ['prashanje_1'])) {
+		foreach ($book ['prashanje_1'] as $odg) {
+			if (!is_numeric ($odg))
+				/* XXX: Некој рачно пробува да биде попаметен. I DOUBT THAT. */
+				continue;
+
+			db_insert ('chss_book_db_answers')
+			-> fields (array (
+				'book_id' => $book['book_id'],
+				'question_id' => 1,
+				'answer' => $odg,
+			))
+			->execute ();
+		}
+	}
+
+	if (isset ($book ['prashanje_2'])) {
+		foreach ($book ['prashanje_2'] as $odg) {
+			if (!is_numeric ($odg))
+				/* XXX: Некој рачно пробува да биде попаметен. I DOUBT THAT. */
+				continue;
+
+			db_insert ('chss_book_db_answers')
+			-> fields (array (
+				'book_id' => $book['book_id'],
+				'question_id' => 2,
+				'answer' => $odg,
+			))
+			->execute ();
+		}
+	}	
+}
+
+function
+_chss_crud () {
+	/* The whole book CRUD interface is here. */
+	/* current_path = ss/crud. Accessible for admin only ($user->uid==1) */
+	$ret = "";
+
+	if (!isset ($_POST ['shto'])) {
+		$ret = chss_generate_crud_fields ();
+	}
+
+	else if ($_POST ['shto'] == 'brishi') {
+		if (!isset ($_POST ['book_id'])) {
+			/* This really shouldn't have happened. */
+			return;
+		}
+
+		$book_id = $_POST ['book_id'];
+
+		if (!chss_zemi_kniga ($book_id)) {
+			$ret = 'No such book.';
+			return;
+		}
+
+		crud_delete ($book_id);
+	}	
+
+	else if ($_POST ['shto'] == 'izmeni') {
+		/* XXX: Update whatever the admin changed. */
+		$book_id = $_POST ['book_id'];
+
+		if (!is_numeric ($book_id)) {
+			$ret = "Some error occured. No such book.";
+			return ($ret);
+		}
+
+		$arr = chss_zemi_kniga ($book_id);
+
+		if (!$arr) {
+			$ret = "No such book.";
+			return ($ret);
+		}
+
+		$book_id = $arr ['book_id'];
+		$responsible = $arr ['responsible'];
+		$title = $arr ['title'];
+		$author = $arr ['author'];
+		$isbn = $arr ['isbn'];
+		$age_min = $arr ['age_min'];
+		$age_max = $arr ['age_max'];
+		$genre = $arr ['genre'];
+		$category = $arr ['category'];
+		$codewords = $arr ['codewords'];
+		$phrase = $arr ['phrase'];
+		$url = $arr ['url'];
+		$price = $arr ['price'];
+		$prashanje_1 = isset ($arr ['prashanje_1']) ? $arr ['prashanje_1'] : array ();
+		$prashanje_2 = isset ($arr ['prashanje_2']) ? $arr ['prashanje_2'] : array ();
+
+		$ret .= '
+		<form action="' . url ("ss/crud") . '" method="post">' .
+			"<input type=\"hidden\" name=\"shto\" value=\"izmeni_sigurno\">" .
+			"Book id: <input type=\"text\" readonly name=\"book_id\" value=\"$book_id\" /><br>" .
+			"Responsible: <input type=\"text\" name=\"responsible\" value=\"$responsible\" /><br>" .			
+			"Title: <input type=\"text\" name=\"title\" value=\"$title\" /><br>" .
+			"ISBN: <input type=\"text\" name=\"isbn\" value=\"$isbn\" /><br>" .
+			"Author: <input type=\"text\" name=\"author\" value=\"$author\" /><br>" .
+
+
+			"Minimum age: <select name=\"age_min\">";
+				for ($i = 2; $i < 100; $i ++) {
+					$selected = ($age_min == $i) ? 'selected' : '';
+                                        $ret .= "<option value=\"$i\" $selected> $i </option>";
+                                }
+			$ret .= "</select><br>" .
+			"Maximum age (100 - max.): <select name=\"age_max\">";
+				for ($i = 2; $i < 100; $i ++) {
+					$selected = ($age_max == $i) ? ' selected' : '';
+
+                                        $ret .= "<option value=\"$i\" $selected> $i </option>";
+                                }
+
+			$ret .=	"</select><br>" .
+			"Genre: <select name=\"genre\">" .
+			"<option value=\"1\"> Masculino </option>" .
+			"<option value=\"2\"> Femenino </option>" .
+			"<option value=\"0\"> Masculino & Femenino </option></select><br>" .
+		
+			"Category: <input type=\"text\" name=\"category\" value=\"$category\" /><br>" .
+			"Codewords: <input type=\"text\" name=\"codewords\" value=\"$codewords\" /><br>" .
+			"Phrase: <input type=\"text\" name=\"phrase\" value=\"$phrase\" /><br>" .
+			"URL: <input type=\"text\" name=\"url\" value=\"$url\" /><br>" .
+			"Price: <input type=\"text\" name=\"price\" value=\"$price\" /><br>" .
+
+			"Who is this book for: " .
+			"<input type=\"checkbox\" " . (isset ($prashanje_1[1]) ? " checked " : "") . "name=\"prashanje_1[]\" value=\"1\"> Ninos </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_1[2]) ? " checked " : "") . "name=\"prashanje_1[]\" value=\"2\"> Mi </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_1[3]) ? " checked " : "") . "name=\"prashanje_1[]\" value=\"3\"> Familia </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_1[4]) ? " checked " : "") . "name=\"prashanje_1[]\" value=\"4\"> Amigos </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_1[5]) ? " checked " : "") . "name=\"prashanje_1[]\" value=\"5\"> Alguien especial </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_1[6]) ? " checked " : "") . "name=\"prashanje_1[]\" value=\"6\"> Los del trabajo </input>" .
+
+			"¿Cómo es la persona que recibirá este regalo?" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[1]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"1\"> Romántico </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[2]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"2\"> Aventurero </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[3]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"3\"> Reflexivo </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[4]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"4\"> Emprendedor </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[5]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"5\"> Culto </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[6]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"6\"> Amante de la Adrenalina </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[7]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"7\"> Cinéfilo </input>" .
+			"<input type=\"checkbox\" " . (isset ($prashanje_2[8]) ? " checked " : "") . "name=\"prashanje_2[]\" value=\"8\"> Divertido </input>" .
+
+			"<input type=\"Submit\" value=\"Update.\" /><br><br>"	.
+			'</form>';
+	}
+
+	else if ($_POST ['shto'] == 'dodadi') {
+		$ret .=	'<form action="' . url ("ss/crud") . '" method="post">' .
+			"<input type=\"hidden\" name=\"shto\" value=\"dodadi_sigurno\">" .
+			"Responsible: <input type=\"text\" name=\"responsible\" value=\"\" /><br>" .
+			"Title: <input type=\"text\" name=\"title\" value=\"\" /><br>" .
+			"ISBN: <input type=\"text\" name=\"isbn\" value=\"\" /><br>" .
+			"Author: <input type=\"text\" name=\"author\" value=\"\" /><br>" .
+			"Responsible: <input type=\"text\" name=\"responsible\" value=\"\" /><br>" .
+			
+			"Minimum age: <select name=\"age_min\">";
+				for ($i = 2; $i < 100; $i ++) {
+                                        $ret .= "<option value=\"$i\"> $i </option>";
+                                }
+			$ret .= "</select><br>" .
+			"Maximum age (100 - max.): <select name=\"age_max\">";
+				for ($i = 2; $i < 100; $i ++) {
+                                        $ret .= "<option value=\"$i\"> $i </option>";
+                                }
+
+			$ret .=	"</select><br>" .
+			"Genre: <select name=\"genre\">" .
+			"<option value=\"1\"> Masculino </option>" .
+			"<option value=\"2\"> Femenino </option>" .
+			"<option value=\"0\"> Masculino & Femenino </option></select><br>" .
+		
+			"Category: <input type=\"text\" name=\"category\" value=\"\" /><br>" .
+			"Codewords: <input type=\"text\" name=\"codewords\" value=\"\" /><br>" .
+			"Phrase: <input type=\"text\" name=\"phrase\" value=\"\" /><br>" .
+			"URL: <input type=\"text\" name=\"url\" value=\"\" /><br>" .
+			"Price: <input type=\"text\" name=\"price\" value=\"\" /><br>" .
+
+			"Who is this book for: " .
+			"<input type=\"checkbox\" name=\"prashanje_1[]\" value=\"1\"> Ninos </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_1[]\" value=\"2\"> Mi </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_1[]\" value=\"3\"> Familia </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_1[]\" value=\"4\"> Amigos </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_1[]\" value=\"5\"> Alguien especial </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_1[]\" value=\"6\"> Los del trabajo </input>" .
+
+			"¿Cómo es la persona que recibirá este regalo?" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"1\"> Romántico </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"2\"> Aventurero </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"3\"> Reflexivo </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"4\"> Emprendedor </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"5\"> Culto </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"6\"> Amante de la Adrenalina </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"7\"> Cinéfilo </input>" .
+			"<input type=\"checkbox\" name=\"prashanje_2[]\" value=\"8\"> Divertido </input>" .
+
+			"<input type=\"Submit\" value=\"Add book.\" /><br><br>"	.
+			'</form>';
+	}
+
+	else if ($_POST ['shto'] == 'dodadi_sigurno') {
+		if (!is_numeric ($_POST ['genre']) ||
+			!is_numeric ($_POST ['age_min']) ||
+			!is_numeric ($_POST ['age_max']) ||
+			!is_numeric ($_POST ['price'])) {
+			$ret = 'Some fields have wrong value. I did not add this book.';
+			return ($ret);
+		}
+
+		$posledno_id = db_insert ('chss_book_db')
+		-> fields (array (
+			'responsible' => $_POST ['responsible'],
+			'title' => $_POST ['title'],
+			'author' => $_POST ['author'],
+			'isbn' => $_POST ['isbn'],
+			'age_min' => $_POST ['age_min'],
+			'age_max' => $_POST ['age_max'],
+			'genre' => $_POST ['genre'],
+			'category' => $_POST ['category'],
+			'codewords' => $_POST ['codewords'],
+			'phrase' => $_POST ['phrase'],
+			'url' => $_POST ['url'],
+			'price' => $_POST ['price'],
+		))->execute ();
+
+		if (isset ($_POST ['prashanje_1'])) {
+			foreach ($_POST ['prashanje_1'] as $odg) {
+				if (!is_numeric ($odg))
+					/* Shouldn't happen.. */
+					continue;
+
+				db_insert ('chss_book_db_answers')
+				-> fields (array (
+					'book_id' => $posledno_id,
+					'question_id' => 1,
+					'answer' => $odg,
+				))
+				->execute ();
+			}
+		}
+
+		if (isset ($_POST ['prashanje_2'])) {
+			foreach ($_POST ['prashanje_2'] as $odg) {
+				if (!is_numeric ($odg))
+					/* Shouldn't happen.. */
+					continue;
+
+				db_insert ('chss_book_db_answers')
+				-> fields (array (
+					'book_id' => $posledno_id,
+					'question_id' => 2,
+					'answer' => $odg,
+				))
+				->execute ();
+			}
+		}
+
+		$ret = 'The book is added.';
+	}
+
+	else if ($_POST ['shto'] == 'izmeni_sigurno') {
+		$book = array ();
+		$book['book_id'] = $_POST ['book_id'];
+		$book['responsible'] = $_POST ['responsible'];
+		$book['title'] = $_POST ['title'];
+		$book['author'] = $_POST ['author'];
+		$book['isbn'] = $_POST ['isbn'];
+		$book['age_min'] = $_POST ['age_min'];
+		$book['age_max'] = $_POST ['age_max'];
+		$book['genre'] = $_POST ['genre'];
+		$book['category'] = $_POST ['category'];
+		$book['codewords'] = $_POST ['codewords'];
+		$book['phrase'] = $_POST ['phrase'];
+		$book['url'] = $_POST ['url'];
+		$book['price'] = $_POST ['price'];
+		$book['prashanje_1'] = isset ($_POST ['prashanje_1']) ? $_POST ['prashanje_1'] : '';
+		$book['prashanje_2'] = isset ($_POST ['prashanje_2']) ? $_POST ['prashanje_2'] : '';
+
+		chss_crud_update ($book);
+
+		$ret = 'The book is updated. Go <a href="' . url ('ss/crud') . '"> back </a>';
+	}
+
+	return ($ret);
+}
+
+function chss_mail ($key, &$message, $param) {
+	if ($key == 'chss') {
+		$message ['subject'] =  $param ['subject'];
+		$message ['body'][] = $param ['message_body'];
+	}
+}
+
+function chss_inform_organizer ($group_id, $user_joined_id, $hash_email) {
+	$grouparr = chss_zemi_grupa ($group_id);
+	$org_info = user_load ($grouparr ['organizer_user_id']);
+	$joined_info = user_load ($user_joined_id);
+
+	$message = $joined_info['name'] . '( ' . $hash_email . ', registered with: ' . $joined_info ['mail'] .
+	') joined your group ' . $grouparr ['group_name'];
+
+	$subject = $joined_info['name'] . ' joined your group (' . $grouparr ['group_name'] . ').';
+
+	drupal_mail ('chss', 'chss', $org_info ['mail'], '',
+	array ('to' => $org_info ['mail'], 'message_body' => $message, 'subject' => $subject), NULL, TRUE);
+}
+
+function chss_inform_closure ($group_id, $uid) {
+	/* Tell this member that the group is closed. */
+	$user_info = user_load ($uid);
+	$group_info = chss_zemi_grupa ($group_id);
+
+	$message = 'Group ' . $group_info['group_name'] . ' closed.';
+	$subject = 'RegaloPerfecto group closed. ' . $group_info ['group_name'];
+
+	drupal_mail ('chss', 'chss', $user_info ['mail'], '',
+	array ('to' => $user_info ['mail'], 'message_body' => $message, 'subject' => $subject), NULL, TRUE);
+
+	/* XXX: Do we publish on his timeline? */
+}
+
+function chss_inform_sender ($group_id, $sender_uid, $receiver_uid) {
+	/* Inform the $sender_uid that he's suppose to buy a gift for $receiver_uid */
+	$sender_info = user_load ($sender_uid);
+	$receiver_info = user_load ($receiver_uid);
+	$group_info = chss_zemi_grupa ($group_id);
+
+	if (!$sender_info || !$receiver_info || !$group_info) {
+		/* XXX: Error. Something has happened. Maybe somebody deleted their user or something? */
+		return;
+	}
+
+	/* XXX: Add correct text here. (Spanish?) */
+
+	$message = 'You should buy a gift for ' . $receiver_info ['name'] . ' ( ' . $receiver_info ['mail'] . ') ';
+	$subject = $group_info['group_name'] . ' has you buying gift for ' . $receiver_info ['name'];
+
+	drupal_mail ('chss', 'chss', $sender_info ['mail'], '',
+	array ('to' => $sender_info ['mail'], 'message_body' => $message, 'subject' => $subject), NULL, TRUE);
+}
+
+function chss_reminder ($email, $message, $groupname, $group_hash) {
+	/* Remind the user. */
+	$real_msg = str_replace (":grouphash", $group_hash, $message);
+	drupal_mail ('chss', 'chss', $email, '', array ('to' => $email, 'message_body' => $real_msg), NULL, TRUE);
+}
+
+function chss_remind_organizer ($uid, $group_name) {
+	/* Remind the organizer of the group. It's closing soon. */
+	$user_info = userload ($uid);
+
+	$message = 'Your group (' . $group_name . '(is closing in 3 days.';
+	drupal_mail ('chss', 'chss', $user_info ['mail'], '',
+	array ('to' => $user_info ['mail'], 'message_body' => $message, 'group_name' => $group_name), NULL, TRUE);
+}
+
+function chss_invite ($email, $message, $groupname, $group_hash) {
+	$real_msg = str_replace (":grouphash", $group_hash, $message);
+	drupal_mail ('chss', 'chss', $email, '', array ('to' => $email, 'message_body' => $real_msg, 'subject' => 'You were invited in a group.'), NULL, TRUE);
+}
+
+function chss_create_group ($email_arr, $invitee_name_arr, $message, $groupname, $closure_date, $gift_date) {
+	/*
+	 * 1) Creates the group in our database.
+	 * 2) Creates one-time hashes for each invitee in this group.
+	 * 3) E-mails everyone.
+	 */
+	global	$user;
+
+	$message = $message . ' Your group hash is: :grouphash.';
+
+	if (!$user->uid) {
+		/* XXX mozhen_error */
+		return;
+	}
+
+	$group_id = db_insert ('chss_group')->fields (array (
+			'group_name' => $groupname,
+			'invite_message' => $message,
+			'organizer_user_id' => $user->uid,
+			'group_status' => 1,
+			'closure_date' => $closure_date,
+			'gift_date' => $gift_date,
+			))->execute ();
+
+	for ($i = 0; $i < count ($email_arr); $i ++) {
+		$ran_num = rand (1000, 100000);
+		$group_hash = md5 ($email_arr [$i] . $ran_num . $group_name . $group_id);
+		db_insert ('chss_group_hashes')->fields (array (
+			'group_id' => $group_id,
+			'email' => $email_arr [$i],
+			'invitee_name' => $invitee_name_arr [$i],	/* XXX: Name? */
+			'group_hash' => $group_hash,
+			'uid' => -1,
+			'hash_status' => 0,
+		))->execute ();
+
+		chss_invite ($email_arr [$i], $message, $groupname, $group_hash);
+	}
+
+	/* Publish on his timeline */
+	chss_post_to_fb_timeline ($user->uid, 'CH Secret Santa', 'Your Secret Santa is here', 'You have successfully created a group');
+
+	return;
+}
+
+function chss_zemi_hash ($grouphash) {
+	/* Returns information about the $grouphash hash. */
+	return (db_query ('select * from {chss_group_hashes} where group_hash = :grouphash', array (':grouphash' => $grouphash))->fetchAssoc ());
+}
+
+function chss_join_group () {
+	/* Actually join a group. */
+	global	$user;
+
+	$grouphash = $_POST ['grouphash'];
+
+	$info_za_hash = chss_zemi_hash ($grouphash);
+
+	if (!$info_za_hash) {
+		$ret = 'This hash does not exist. Plese check your e-mail for the right one';
+		/* XXX: Mozhen error. */
+		return ($ret);
+	}
+
+	if ($info_za_hash ['hash_status'] == 1) {
+		/* XXX: This hash has already been used. */
+		$ret = 'This hash has already been used. You can only use a hash once.';
+		return ($ret);
+	}
+
+	/* OK, this user is in the group now. */
+
+	db_insert ('chss_group_def')->fields (array (
+		'group_id' => $info_za_hash ['group_id'],
+		'user_id' => $user->uid,
+	))->execute ();
+
+	/* Make sure the hash is marked as used. */
+
+	db_update ('chss_group_hashes')->fields (array (
+		'hash_status' => 1,
+	))->where ('group_hash = :group_hash', array ('group_hash' => $grouphash))
+	->execute ();
+
+	/* Publish on his timeline */
+	chss_post_to_fb_timeline ($user->uid, 'CH Secret Santa', 'Your Secret Santa is here', 'You have just joined a group on RegaloPerfecto');
+
+	/* Inform the group organizer, too. */
+
+	chss_inform_organizer ($info_za_hash ['group_id'], $user->uid, $info_za_hash ['email']);
+
+	return ('You have joined the group');
+}
+
+function chss_zemi_grupa ($group_id) {
+	/* Returns information about the group $group_id */
+	$arr = db_query ('select * from {chss_group} where group_id = :group_id', array (':group_id' => $group_id))->fetchAssoc ();
+	return ($arr);
+}
+
+function chss_close_group ($group_id) {
+	/* 1) Execute the shuffle.
+	 * 2) E-mail every user who are they suppose to give a gift to.
+	 * 3) Close the group.
+	 * 4) Inform everyone that the group is closed.
+	 */
+	$site = array ();
+
+	$iz = db_query ('select * from chss_group_def where group_id=:group_id', array ('group_id' => $group_id));
+
+	while ($arr = $iz->fetchAssoc ()) {
+		array_push ($site, $iz['user_id']);
+	}
+
+	$kolku = count ($site);
+
+	if ($kolku == 1) {
+		/* There's only one person in this group. This can't happen. */
+		/* XXX: */
+		return;
+	}
+
+	/* Shuffle 1..$kolku */
+
+	$rand_ind = range (1, $kolku);
+	shuffle ($rand_ind);
+
+	for ($i = 1; $i < $kolku; $i ++) {
+		db_insert ('chss_shuffle')
+		->fields (array (
+			'group_id' => $group_id,
+			'receiver_id' => $site [$rand_ind [$i]],
+			'sender_id' => $site [$i],
+		))->execute ();
+
+		/* Inform the sender about the random choice of the person he's suppose to give a gift to. */
+		chss_inform_sender ($group_id, $site [$rand_ind [$i]], $site [$i]);
+		/* XXX: What information is being shared here? Also, do we send along recommendation? */
+	}
+
+	/* Close the group */	
+	db_update ('chss_group')
+	->fields (array (
+	'group_status' => 0
+	))->where ('group_id = :group_id', array ('group_id' => $group_id))
+	->execute ();
+
+	/* Inform everyone that the group is closed */
+	foreach ($site as $uid) {
+		/* Publish on their timelines, too. */
+		chss_post_to_fb_timeline ($user->uid, 'CH Secret Santa', 'Your Secret Santa is here', 'Your group has closed');
+		chss_inform_closure ($group_id, $uid);
+	}
+}
+
+function chss_group_gift_date ($group_id) {
+	/* A gift date for this group has arrived.
+	 * Publish on everybody's timeline
+	 */
+	chss_post_to_fb_timeline ($user->uid, 'CH Secret Santa', 'Your Secret Santa is here', 'You have just joined a group on RegaloPerfecto');
+}
+
+function chss_cron () {
+	/* Periodically run this function (once a day.
+	 */
+
+	$cron_last = db_query ('select timestamp from {watchdog} where type="cron" order by timestamp desc limit 1')->fetchField ();
+
+	if (date ('ymd', $cron_last) != date ('ymd', time ())) {
+		/* Check if any of the groups have set today as their gift day date. */
+		$iz = db_query ('select group_id from {chss_group} where gift_date = :gift_date', array ('gift_date' => date ('Y-m-d', time()) . ' 00:00:00'));
+
+		while ($arr = $iz->fetchAssoc ()) {
+			chss_group_gift_date ($arr ['group_id']);
+		}
+
+		/* Check which groups need to be closed. */
+		$iz = db_query ('select * from {chss_group} where (closure_date <= now()) and (group_status = 1)');
+
+		while ($arr = $iz->fetchAssoc ()) {
+			/* XXX: Inform everyone that the group is closed? */
+			chss_close_group ($arr ['group_id']);
+		}
+
+		/* Check which groups are approaching the closing date. */
+		$iz = db_query ('select * from {chss_group} where month (closure_date) = month (now) and' .
+		'day (closure_date) = date_sub (now (), interval 3 day) and year (closure_date) = year (now())');
+
+		while ($arr = $iz->fetchAssoc ()) {
+			/* Inform the users which have not used their group hash. */
+			$iz_2 = db_query ('select * from {chss_group_hashes} where group_id = :group_id and hash_status = 0',
+			array (':group_id' => $arr ['group_id'])); 
+
+			while ($arr_2 = $iz_2->fetchAssoc ()) {
+				chss_remind ($arr_2 ['email'], $message, $arr ['group_name'], $arr_2 ['group_hash']); 
+			}
+
+			/* Inform the organizer, too. He might want to extend the closing date. */
+			chss_remind_organizer ($arr ['organizer_user_id'], $arr ['group_name']);
+		}
+	}
+}
+
+function chss_mygroups () {
+	/* 
+	 * 1) Finds every group that the current user is in.
+	 * 2) Finds every group that he organized as well.
+	 */
+
+	global	$user;
+
+	$ret = 'You are a member in:' . chss_find_my_groups ();
+	$ret .= '<br>';
+
+	$iz = db_query ('select * from {chss_group} where organizer_user_id=:uid', array (':uid' => $user->uid));
+
+	if ($iz->rowCount ()) {
+		$ret .= 'You are an organizator of these groups: ';
+
+		while ($arr = $iz->fetchAssoc ()) {
+			$ret .= '<br>';
+			$ret .= '<a href="' . url ('ss/orginfo') . '?groupid=' . $arr ['group_id'] . '"> ' . $arr ['group_name'] . '</a>';
+		}
+	}
+
+	return ($ret);
+}
+
+function chss_my_orginfo () {
+	/* Finds every group that the current user has organized. */
+	global	$user;
+
+	$tmparr = array ();
+	$moi_orginfo = array ();
+
+	$iz = db_query ('select * from {chss_group} where organizer_user_id=:uid', array (':uid' => $user->uid));
+
+	if ($iz->rowCount ()) {
+		while ($arr = $iz->fetchAssoc ()) {
+			$tmparr = chss_zemi_grupa ($arr['group_id']);
+			$tmparr ['group_def'] = chss_zemi_group_def ($arr['group_id']);
+			$tmparr ['group_hashes'] = chss_zemi_hashes ($arr['group_id']);
+
+			array_push ($moi_orginfo, $tmparr);
+		}
+	}
+
+	return ($moi_orginfo);
+}
+
+function chss_find_my_groups () {
+	/* Finds every group in which the current user belongs in. */
+	global	$user;
+
+	$moi_grupi = array ();
+	$ret = '';
+	$k = 0;
+
+	$iz = db_query ('select * from {chss_group_def} where user_id = :uid', array (':uid' => $user->uid));
+
+	while ($arr = $iz->fetchAssoc ()) {
+		array_push ($moi_grupi, chss_zemi_grupa ($arr ['group_id']));
+	}
+
+	return ($moi_grupi);
+}
+
+function chss_org_li_sum ($groupid) {
+	/* Am I an organizator of this group? */
+	global	$user;
+
+	if ($iz = db_query ("select organizer_user_id from {chss_group} where group_id=:groupid", array (':groupid' => $groupid))) {
+		$arr = $iz->fetchAssoc ();
+
+		if ($arr ['organizer_user_id'] == $user->uid) {
+			return (true);
+		}
+	}
+
+	return (false);
+}
+
+function chss_zemi_group_def ($group_id) {
+	return (db_query ('select * from {chss_group_def} where group_id = :group_id', array (':group_id' => $group_id))->fetchAll ());
+}
+
+function chss_zemi_hashes ($group_id) {
+	return (db_query ('select * from {chss_group_hashes} where group_id = :group_id', array (':group_id' => $group_id)) ->fetchAll ());
+}
+
+function chss_org_group_info ($groupid) {
+	/* Returns the detailed information about the group with id $groupid.
+	 * This includes all the hashes with their status, the current group members and their information.
+	 */
+	/* Ready for HTML rendering. XXX: Do this @ template side? */
+
+	$group_arr = chss_zemi_grupa ($groupid);
+	$group_def = chss_zemi_group_def ($groupid);
+	$group_hashes = chss_zemi_hashes ($groupid);
+
+	$ret = '';
+
+	$ret .= '<br>Group name: ' . $group_arr ['group_name'];
+	$ret .= '<br>Invite message' . $group_arr ['invite_message'];
+	$ret .= 'Members: ';
+
+	while ($iz = $group_def->fetchAssoc ()) {
+		$user_info = user_load ($iz ['user_id']);
+
+		$ret .= '(' . $user_info['uid'] . ') ' . $user_info ['name'] . ' ; ' . $user_info ['mail'];
+		$ret .= '<br>';
+	}
+
+	$ret .= '<br> Unused hashes: ';
+
+	while ($iz = $group_hashes->fetchAssoc ()) {
+		if (!$iz['hash_status']) {
+			$ret .= '(intented for: ' . $iz ['email'] . '): ' . $iz ['group_hash'];
+			$ret .= '<br>';
+		}
+	}
+
+	return ($ret);
+}
+
+function _chss_admin_interface () {
+	/* XXX: Is it even required? */
+	$ret = '';
+
+	$ret = '<a href="' . url ('ss/crud') . '"> CRUD </a>';
+	$ret .= 'Currently active groups: ';
+
+	$iz = db_query ('select * from {chss_group} where group_status <> -1');
+
+	while ($arr = $iz->fetchAssoc ()) {
+		$ret .= $arr ['group_id'] . ') ' . $arr['group_name'] .
+		'<a href="' . url ('ss/terminate?group_id=' . $arr ['group_id']) . '"> (terminate) </a><br>';
+	}
+
+	return ($ret);
+}
+
+function chss_homepage () {
+	global	$user;
+	$ret = '';
+#	$ret = _chss_presmetaj_preporaka ($user->uid);
+
+	return ('');
+#	return ($ret);
+}
+
+function _chss_content ($arg) {
+	/* ss/$arg leads here. Main content. */
+ 
+	global	$user;
+	$ret = '';
+
+	switch ($arg) {
+		case	'admin':
+			if ($user->uid == 1) {
+				$ret = _chss_admin_interface ();
+			}
+
+			break;
+
+		case	'crud':
+			if ($user->uid == 1) {
+				$ret = _chss_crud ();
+			}
+
+			break;
+
+		case	'homepage':
+			$ret = chss_homepage ();
+			break;
+
+		case	'group':
+			break;
+
+		case	'recommendations':
+			if (!_chss_ima_li_odgovoreno ())
+				drupal_goto ('ss/qb');
+
+			break;
+
+		case	'grouporg':
+			break;
+
+		case	'creategroup':
+			if (!_chss_ima_li_odgovoreno ()) {
+				global $user;
+				break;
+			}
+
+			if (!isset ($_POST ['email_arr']) ||
+				!isset ($_POST ['invitee_name_arr']) ||
+				!isset ($_POST ['message']) ||
+				!isset ($_POST ['groupname']) ||
+				!isset ($_POST ['closure_day']) ||
+				!isset ($_POST ['closure_month']) ||
+				!isset ($_POST ['closure_year']) ||
+				!isset ($_POST ['gift_day']) ||
+				!isset ($_POST ['gift_month']) ||
+				!isset ($_POST ['gift_year'])) {
+				/* Erm, something was not filled.. */
+				break;
+			}
+
+			$email_arr = $_POST ['email_arr'];
+			$invitee_name_arr = $_POST ['invitee_name_arr'];
+
+			if (count ($email_arr) != count ($invitee_name_arr)) {
+				/* Fields missing. */
+				break;
+			}
+
+			$message = $_POST ['message'];
+			$groupname = $_POST ['groupname'];
+
+			/* datetime format. */
+			$gift_date = $_POST ['gift_year'] . '-' . $_POST ['gift_month'] . '-' . $_POST['gift_day'] . ' 00:00:00';
+			$closure_date = $_POST ['closure_year'] . '-' . $_POST ['closure_month'] . '-' . $_POST['closure_day'] . ' 00:00:00';
+
+			chss_create_group ($email_arr, $invitee_name_arr, $message, $groupname, $closure_date, $gift_date);
+			drupal_goto ('ss/homepage');	/* Maybe redirect him to the groups now? No information about it. XXX */
+			break;
+
+		case	'qb':
+			break;
+
+		case	'qb_1':
+			/* He chose the books. */
+
+			if (!isset ($_POST ['realno_odgovara'])) {
+				break;
+			}
+
+			$odgovor_1 = $_POST ['prashanje_1'];
+			$odgovor_2 = $_POST ['prashanje_2'];
+			$odgovor_3 = $_POST ['prashanje_3'];
+			$odgovor_4 = $_POST ['prashanje_4'];
+			$odgovor_5 = $_POST ['prashanje_5'];
+			$preferred = isset ($_POST ['preferred']) ? $_POST ['preferred'] : '';
+
+			if (!is_numeric ($odgovor_1) ||
+				!is_numeric ($odgovor_2) ||
+				!is_numeric ($odgovor_3) ||
+				!is_numeric ($odgovor_4) ||
+				!is_numeric ($odgovor_5))
+				return;
+
+			chss_vnesi_anketa ($user->uid, $odgovor_1, $odgovor_2, $odgovor_3, $odgovor_4, $odgovor_5, $preferred);
+			drupal_goto ('ss/qb');
+
+			break;
+
+		case	'qb_2':
+			/* He chose the other presents. */
+			/* XXX: no information about it yet. */
+			break;
+
+		case	'groupjoin':
+			if (!_chss_ima_li_odgovoreno ()) {
+				#$ret = 'You have to answer the questionnaire first, before joining a group.';
+				break;
+			}
+
+			if (isset ($_POST ['shto']) && $_POST ['shto'] == 'probuva' && isset ($_POST ['grouphash'])) {
+				$ret = chss_join_group ();
+			}
+
+			else {
+#				$ret = 'Empty hash or invalid form. Try again, please.';
+
+				/*$ret = 'You are currently in these groups:' . chss_find_my_groups () . '<br><hr><br>
+				<form action="' . url ('ss/groupjoin') . '" method="post">
+				<input type="hidden" name="shto" value="probuva">
+				Enter your hash, etc. to join a group: <input type="text" name="grouphash" /><br>
+				<input type="Submit" value="Join a group!" /></form><br>
+				Or rather, create one yourself <a href="' . url ('ss/grouporg') . '"> here </a>';*/
+			}
+	
+			break;
+
+		case	'orginfo':
+			/* XXX: Not sure if needed. */
+			/* Logic's done at the template. */
+			if (isset ($_GET ['groupid'])) {
+				$groupid = $_GET ['groupid'];
+
+				if (!is_numeric ($groupid)) {
+					$ret = 'This group id is not even numeric.';
+					break;
+				}
+
+				if (chss_org_li_sum ($groupid)) {
+					$ret = 'You are not an organizator of this group.';
+					break;
+				}
+
+			/*	$ret = 'Here is the information about the selected group.';
+				$ret .= chss_org_group_info ($groupid); */
+			}
+
+			else {
+				/* XXX: ? How did he even come up here. */
+			}
+
+			break;
+
+		case	'mygroups':
+			#$ret = chss_mygroups ();
+			break;
+
+		default:
+			drupal_goto ('ss/homepage');
+			#$ret = 'This page does not exist. Please check your URL carefully (' . $arg . ')';
+			break;
+	}
+
+	return ($ret);
+}
+
+function chss_zemi_sleden_access_token () {
+	/* XXX: Freshen up the access token for the next 60 days. */
+}
+
+function chss_zachuvaj_access_token ($uid, $access_token) {
+	/* Store the access token for automatically posting to timeline. */
+	if (db_query ('select uid from {chss_fb_tokens} where uid=:uid', array (':uid' => $uid))->rowCount ()) {
+		db_update ('chss_fb_tokens')
+			->fields (array (
+			'access_token' => $access_token,
+			))->where ('uid = :uid', array ('uid' => $uid))
+			->execute ();
+	}
+
+	else {
+		db_insert ('chss_fb_tokens')
+		->fields (array (
+			'uid' => $uid,
+			'access_token' => $access_token,
+		))
+		->execute ();
+	}
+}
+
+function chss_najdi_access_token ($uid) {
+	/* Retrieves the last FB access token from our database. NULL, if there's none. */
+
+	$iz = db_query ('select * from {chss_fb_tokens} where uid=:uid', array (':uid' => $uid));
+	$arr = $iz->fetchAssoc ();
+
+	if ($arr)
+		return ($arr ['access_token']);
+
+	return ("");	/* Maybe he declined us access? */
+}
+
+function chss_post_to_fb_timeline ($uid, $name, $description, $message) {
+	$user_access_token = chss_najdi_access_token ($uid);
+
+	if (!function_exists ('fboauth_graph_query'))
+		/* fboauth is required. */
+		return;
+
+	fboauth_graph_query ('me/feed', $user_access_token,
+                array ( 
+                        'message' => "$message",
+                        'name' => '$name',
+                        'description' => "$description",
+                ), "POST");	/* No way to tell if we are successfully */
+}
