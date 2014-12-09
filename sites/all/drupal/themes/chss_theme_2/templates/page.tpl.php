@@ -92,29 +92,34 @@ global $user;
 $obj = _chss_presmetaj_preporaka ($user->uid);
 //print_r ($obj);
 
+
+
 global $base_url;
 $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
+drupal_add_css(drupal_get_path('theme', 'chss_theme_2') .'css/pop.css');
+drupal_add_css('http://dimsemenov-static.s3.amazonaws.com/dist/magnific-popup.css', 'external');
+drupal_add_js('//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js', 'external');
+drupal_add_js('http://dimsemenov-static.s3.amazonaws.com/dist/jquery.magnific-popup.min.js', 'external');
+
 ?>
-
-
 
 
 <?php 
 	print render($page['content']);
-?>
 
+?>
 
 
 
 	
 <?php 
 
-	if (current_path() == 'ss/homepage' || current_path() == 'ss/qb' || current_path() == 'ss/orginfo')
+	if (current_path() == 'ss/homepage' || current_path() == 'ss/qb' || current_path() == 'ss/orginfo' || current_path() == 'ss/lr' )
 	{
 		echo'
 	
 	<div id="headerSS">
-		<div id="headerLogo"><img src="'.$iurl.'images/chss/logo-regalo-perfecto.png" alt=""/></div>
+		<div id="headerLogo"><a href="'.$base_url.'/ss/homepage"><img src="'.$iurl.'images/chss/logo-regalo-perfecto.png" alt=""/></a></div>
 		<div id="headerLinkovi">
 			<div id="headerHash">#REGALO<b>PERFECTO</b></div>
 			<div id="headerA">';
@@ -124,14 +129,14 @@ $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
 				
 				<a href=qb>ENCUENTRA TU LIBRO&nbsp;&nbsp;&nbsp;|</a>
 				
-				<a href=orginfo>&nbsp;&nbsp;&nbsp;ORGANIZA TU INTERCAMBIO&nbsp;&nbsp;&nbsp;|</a>
+				<a href=orginfo>&nbsp;&nbsp;&nbsp;ORGANIZA  TU  INTERCAMBIO&nbsp;&nbsp;&nbsp;|</a>
 				
 					'; }
 					
 					else { echo '
 					<a href="#" onclick="popUp1()">ENCUENTRA TU LIBRO&nbsp;&nbsp;&nbsp;|</a>
 				
-				<a href="#" onclick="popUp1()">&nbsp;&nbsp;&nbsp;ORGANIZA TU INTERCAMBIO&nbsp;&nbsp;&nbsp;|</a>
+				<a href="#" onclick="popUp1()">&nbsp;&nbsp;&nbsp;ORGANIZA  TU  INTERCAMBIO&nbsp;&nbsp;&nbsp;|</a>
 				
 					'; }
 					
@@ -162,11 +167,12 @@ $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
 			</div>
 		</div>
 		
+		<div id="nubeBlanca">
 		<div id="podHeaderBelo">
 		</div>
 		<div id="podHeaderPoklonchinja"> <img src="'.$iurl.'images/chss/regalos-logo-gandhi.png" alt=""/> </div>
 		<div id="podHeaderLogo"> <img src="'.$iurl.'images/chss/logo-gandhi.png" alt=""/> </div>
-		
+		</div>
 		
 	</div>';
 
@@ -178,12 +184,12 @@ $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
 
 	if (current_path () == 'ss/homepage') { echo'
 	
-	
+
+
 
 
 <div id="popUp1All">
 	<div id="popUp1Overlay"></div>
-	
 	<div id="popUp1Container">
 		
 		
@@ -195,21 +201,24 @@ $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
 			<img src="'.$iurl.'images/close-icon.jpg" alt=""/>
 		</div>
 		
-		<div id="popUp1Teks">Regístrate para hacer tu intercambio a través de:</div>
+		<div id="popUp1Teks">Para ver las mejores recomendaciones de regalo ingresa a través de:</div>
 		
 		<div id="popUp1Loginz">
 			<div id="popUp1fb">
-				<div id="popUp1fbKopche">
-					<a href="https://www.facebook.com/dialog/oauth?client_id=...">facebook connect</a>
+				<div id="popUp1fbKopche1">
+					<a href="https://www.facebook.com/dialog/oauth?client_id=..."><img src="'.$iurl.'/images/btn-fb.jpg" /></a>
 					
 					<!--<a class="facebook-action-connect" rel="nofollow" href="https://www.facebook.com/dialog/oauth?client_id=1499300647024509&amp;redirect_uri=http%3A//chelik.org%3A60080/ma/drupal/fboauth/connect%3Fdestination%3Dss%252Fhomepage&amp;scope=email%2Cpublish_actions"><img src="http://www.facebook.com/images/fbconnect/login-buttons/connect_light_medium_short.gif" alt=""></a>-->
 					 
 					
 				</div>
 				<div id="popUp1fbtxt">
-					Regalo perfecto no publicará en su cuenta de Facebook sin su consentimento.
+					Regalo perfecto no publicará nada en su cuenta de Facebook sin su consentimento.
 				</div>
+				<div id="oMiddle">o</div>
 			</div>
+
+
 			 <!--<form id="formReg" action="/ma/drupal/user/register" method="post">-->
 			
 			<form id="popUp1Mail" action="'.$base_url.'/user/register" method="post">
@@ -223,11 +232,9 @@ $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
 				
 			</form>
 			
-			<!--</form>-->
-			
 		</div>
 		
-		<div id="popUp1member">¿Ya eres miembro? <a href="#" onclick="popUp2()"><b>Entrar</b></a></div>
+		<div id="popUp1member">¿Ya eres miembro? <a href="#popUp2Container" class="open-popup-link" ><b style="font-family:PlexesProBook;">Entrar.</b></a></div>
 		
 	</div>
 			
@@ -253,8 +260,8 @@ $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
 		
 		<div id="popUp2Loginz">
 			<div id="popUp2fb">
-				<div id="popUp2fbKopche">
-					<a href="https://www.facebook.com/dialog/oauth?client_id=[client_id]">facebook connect</a>
+				<div id="popUp2fbKopche1">
+					<a href="https://www.facebook.com/dialog/oauth?client_id=[client_id]"><img src="'.$iurl.'/images/btn-fb.jpg" /></a>
 					
 				</div>
 				<div id="popUp2fbtxt">
@@ -275,7 +282,7 @@ $iurl = $base_url.'/'.drupal_get_path('theme','chss_theme_2').'/';
 			
 		</div>
 		
-		<div id="popUp2member">¿Aún no eres miembro? <a href="#" onclick="popUp1()"><b>Regístrate aquí</b></a></div>
+		<div id="popUp2member">¿Aún no eres miembro? <a href="#popUp1Container" class="open-popup-link" onclick=""><b style="font-family:PlexesProBook;">Regístrate aquí</b></a></div>
 		
 	</div>
 			
@@ -308,10 +315,12 @@ echo '
 				Ya no busques más, aquí encontrarás el <b>REGALOPERFECTO:</b> un libro.
 			</div>
 			<div id="homeGoreL2">
-				Responde el siguiente formulario y encuentra el libro ideal para regalar esta Navidad
+				Responde el siguiente formulario y encuentra</br>
+				el libro ideal para regalar</br>
+				esta Navidad
 			</div>
 		</div>
-		
+
 		<div id="homeGoreDesno">
 			<div id="homeGoreD1"><a href=qb>"Dime qué le gusta y te diremos <b> qué libro es</b>"</a></div>
 			<form id="homeGoreD2" action="' . url ('ss/qb') . '" method="post">
@@ -370,7 +379,7 @@ echo '
 				<input type="hidden" name="realno_odgovara" value="1" /> ';
 				
 			if (!_chss_ima_li_odgovoreno ())
-				echo'<div class="kopche" id="homeGoreDKopche" onclick="submitit3()">ENVIAR</div>';
+				echo'<a href="#popUp2Container" class="open-popup-link" ><div class="kopche" id="homeGoreDKopche" onclick="">ENVIAR</div></a>';
 			
 			
 			else 
@@ -378,7 +387,7 @@ echo '
 			
 			echo'</form>
 		</div>
-	
+		
 	</div>
 	';
 	
@@ -388,13 +397,18 @@ echo '
 	echo '<div id="homePoklonchinja">
 		<div id="homePoklonchinjaSlika"> 
 			<img src="'.$iurl.'images/chss/tres-regalos.png" alt=""/>
+
+		</div>
+		<!-- Popup -->
+		<div id="test-popup" class="white-popup mfp-hide">
 		</div>
 		
+		
 		<div id="homePoklonchinjaDr">
-			<h1>ORGANIZA TU INTERCAMBIO</h1>
+			<h1>ORGANIZA &nbsp;TU &nbsp;INTERCAMBIO</h1>
 			<p>con nuestra App gratuita de amigo secreto.</p>
-			<!--<div class="kopche" id="homePoklonchinjaKopche"><a href=mygroups>COMIENZA AQUÍ</a></div>-->
-			<div class="kopche" id="homePoklonchinjaKopche"><a href=#>COMIENZA AQUÍ</a></div>
+			<!--<div class="kopche" id="homePoklonchinjaKopche"><a href="mygroups">COMIENZA AQUÍ</a></div>-->
+			<div class="kopche" id="homePoklonchinjaKopche"><a href="#popUp2Container" class="open-popup-link">COMIENZA AQUÍ</a></div>
 		</div>
 	</div>
 
@@ -425,7 +439,19 @@ echo '
 		</div>
 
 		<div id="homeBlok2teksDole">Promoción válida en</div>
-		<div id="homeBlok2DropDown" class="dropdownMF"><a href="#">SUCURSAL</a><div class="triagolnik"></div></div>
+		<div id="homeBlok2teksDole"><select name="prashanje_1" class="dropdownMF">
+					<option selected>SUCURSALES</option>
+                			<option value="">Mauricio Achar</option>
+                			<option value="">Bellas Artes</option>
+                			<option value="">Guadalajara</option>
+                			<option value="">Monterey</option>
+                			<option value="">Puebla</option>
+                			<option value="">Querétaro</option>
+                			<option value="">Satélite</option>
+                			<option value="">Polanco</option>
+                			<option value="">Santa Fe</option>
+                			<option value="">Coapa</option>
+                		</select></div>
 	</div>
 	
 	
@@ -660,7 +686,7 @@ echo '<div id="homeContainer1" >
 		<div id="recNaslov">ENCUENTRA TU LIBRO</div>
 		<div id="recPodnaslov">Loremimsum</div>
 		<div id="recPodpodnaslov">El arte la Quietud</div>
-		<div id="recTekstche">Cu quo facer noster docendi, ex quo quidam apeirian instructior. Verear dolores at mei, et qui sale molestiae, has te pertinax rationibus... </div>
+		<div id="recTekstche">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque pretium sapien ligula, ut lacinia diam hendrerit ac. Nam elementum vel elit in laoreet. Aliquam id sagittis sem, rutrum dapibus lorem. Sed bibendum commodo leo at bibendum. Sed tempor libero lacus, id maximus massa aliquet ut. </div>
 	
 		<div id="recKnigite">';
 			
@@ -692,8 +718,12 @@ echo '<div id="homeContainer1" >
 			</div>-->
 			*/
 		echo '</div>
-	
-		<div id="knigiNekiTekst"> Puedes escoger hasta 4 libros </div>
+
+		<div id="libros" >
+		<iframe scrolling="no" src="'.$iurl.'/js/carousel/index.html" frameborder="0" height="400" width="710px"></iframe>
+		</div>
+
+		<div id="knigiNekiTekst"> *Puedes escoger hasta 4 libros </div>
 		
 		<div id="knigiKopche" class="kopche">ENVIAR "A TU AMIGO SECRETO"</div>
 	
@@ -723,6 +753,99 @@ echo '<div id="homeContainer1" >
 	
 }
 
+
+else if (current_path () == 'ss/lr') { 
+
+
+echo '<div id="homeContainer1" >
+	<div id="recommendationGore">
+		<div id="recNaslov">ENCUENTRA TU LIBRO</div>
+		<div id="recPodnaslov">Tu lista de Regalo</div>
+		<!--<div id="recPodpodnaslov">El arte la Quietud</div>-->
+		<div id="recTekstche">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque pretium sapien ligula, ut lacinia diam hendrerit ac. Nam elementum vel elit in laoreet. Aliquam id sagittis sem, rutrum dapibus lorem. Sed bibendum commodo leo at bibendum. Sed tempor libero lacus, id maximus massa aliquet ut. </div>
+	
+		<div id="recKnigite">';
+			
+			$preporaki = _chss_presmetaj_preporaka ($user->uid);
+	
+			foreach ($preporaki as $preporaka)
+			{
+				$i=0;
+				foreach($preporaka as $p)
+				{
+					if($i==2) { echo'
+					<div class="ednaKniga">
+						<div class="knigaSlika"> <img src=""  alt="slika"/> </div>
+						<div class="knigaTekst">' . $p .' </div>
+					</div>
+			
+			
+					'; }
+			
+						
+					$i++;
+				}
+			}
+			
+			/*
+			<!--<div class="ednaKniga">
+				<div class="knigaSlika"> <img src="" alt="slika"/> </div>
+				<div class="knigaTekst"> tekssss</div>
+			</div>-->
+			*/
+		echo '</div>
+
+		<div id="libros2" >
+		<div style="margin-left:-10px;">
+			<img style="width:150px;" src="'.$iurl.'images/libro-rojo.jpg" alt=""/>
+			<p>Learning from Libro Rojo</p>
+			</div>
+
+
+		<div style="margin-top:-280px; margin-left:150px;">
+			<img style="width:150px;" src="'.$iurl.'images/libro-rojo.jpg" alt=""/>
+			<p>Learning from Libro Rojo</p>
+			</div>
+
+		<div style="margin-top:-280px; margin-left:310px;">
+			<img style="width:150px;" src="'.$iurl.'images/libro-rojo.jpg" alt=""/>
+			<p>Learning from Libro Rojo</p>
+			</div>
+
+		<div style="margin-top:-280px; margin-left:470px;">
+			<img style="width:150px;" src="'.$iurl.'images/libro-rojo.jpg" alt=""/>
+			<p>Learning from Libro Rojo</p>
+			</div>
+
+		</div>
+
+		
+
+		<div style="width:100px;" id="knigiKopche" class="kopche" ><a href="homepage">REGRESAR</a></div>
+
+
+
+
+		<a href="#popUp2Container" class="open-popup-link" ><div style="width:100px; margin-top:-42px; margin-left:340px;" id="knigiKopche" class="kopche">ENVIAR</div></A>
+	
+	';
+	/*
+	
+	*/
+	echo '
+	
+	</div>
+
+	
+	
+	
+	
+	
+</div>';
+	
+	
+	
+}
 
 
 else if (current_path () == 'ss/mygroups') { 
@@ -776,6 +899,21 @@ Enter your hash, etc. to join a group: <input type="text" name="grouphash" /><br
 </div>
 <?php //} 
 ?>
+
+<script>
+$('.open-popup-link').magnificPopup({
+    type: 'inline',
+    midClick: true
+});
+$('button').magnificPopup({
+    items: {
+        src: '<div class="white-popup">Dynamically created popup</div>',
+        type: 'inline'
+    },
+    closeBtnInside: true
+});
+//@ sourceURL=pen.js
+</script>
 
 <script>
 function gotohome() {

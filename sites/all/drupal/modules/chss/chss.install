@@ -1,0 +1,1344 @@
+<?php
+
+function chss_schema () {
+	if (!db_table_exists ('chss_fb_tokens')) {
+
+	$schema ['chss_fb_tokens'] = array (
+                'fields' => array (
+                        'uid' => array (
+                                'type' => 'int',
+                                'unsigned' => TRUE,
+                                'not null' => TRUE,
+                        ),
+
+                        'access_token' => array (
+                                'type' => 'varchar',
+                                'length' => '255',
+                                'not null' => TRUE,
+                        ),
+                ),
+
+		'primary key' => array ('uid'),
+        );
+	}
+
+	if (!db_table_exists ('chss_book_db')) {
+
+	$schema ['chss_book_db'] = array (
+		'description' => 'The book database.',
+		'fields' => array (
+			'book_id' => array (
+				'description' => 'Book ID.',
+				'type' => 'serial',
+				'not null' => TRUE,
+			),
+
+			'responsible' => array (
+				'description' => 'Person responsible (at their shop) for this book.',
+				'type' => 'varchar',
+				'length' => 255,
+			),
+
+			'title' => array (
+				'description' => 'Book title.',
+				'type' => 'varchar',
+				'length' => 255,
+			),
+
+			'author' => array (
+				'description' => 'Author of the book',
+				'type' => 'varchar',
+				'length' => 255,
+			),
+
+			'isbn' => array (
+				'description' => 'ISBN.',
+				'type' => 'varchar',
+				'length' => 100,
+			),
+
+			'age_min' => array (
+				'description' => 'Minimum reader age.',
+				'type' => 'int',
+			),
+
+			'age_max' => array (
+				'description' => 'Maximum reader age (0 - 101).',
+				'type' => 'int',
+			),
+
+			'genre' => array (
+				'description' => 'Book genre',
+				'type' => 'int',
+			),
+
+			'category' => array (
+				'description' => 'Category',
+				'type' => 'varchar',
+				'length' => 255,
+			),
+
+			'codewords' => array (
+				'description' => 'Code words',
+				'type' => 'varchar',
+				'length' => 255,
+			),
+
+			'phrase' => array (
+				'description' => 'Phrase',
+				'type' => 'varchar',
+				'length' => 255,
+			),
+
+			'url' => array (
+				'description' => 'URL at the bookstore',
+				'type' => 'varchar',
+				'length' => 1024,
+			),
+
+			'price' => array (
+				'description' => 'Price of the book.',
+				'type' => 'int',
+			),
+		),
+
+		'primary key' => array ('book_id'),
+	);
+	}
+
+	if (!db_table_exists ('chss_book_db_answers')) {
+
+	$schema ['chss_book_db_answers'] = array (
+		'desription' => 'The corresponding answers for the book',
+		'fields' => array (
+			'book_id' => array (
+				'description' => 'Book ID',
+				'type' => 'int',
+				'not null' => TRUE,
+			),
+
+			'question_id' => array (
+				'description' => 'This selected',
+				'type' => 'int',
+				'not null' => TRUE,
+			),
+
+			'answer' => array (
+				'description' => 'Answer for this question related to this book',
+				'type' => 'int',
+				'not null' => TRUE,
+			),
+		),
+	);
+	}
+
+	if (!db_table_exists ('chss_anketa')) {
+
+	$schema['chss_anketa'] = array (
+		'description' => 'The answers from the questionnaire.',
+		'fields' => array (
+			'user_id' => array (
+				'description' => 'User id.',
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => -1,
+			),
+
+			'odgovor_1' => array (
+				'description' => 'Answer to #1 question',
+				'type' => 'int',
+				'not null' => TRUE,
+			),
+
+
+			'odgovor_2' => array (
+				'description' => 'Answer to #2 question',
+				'type' => 'int',
+			),
+
+			'odgovor_3' => array (
+				'description' => 'Answer to #3 question',
+				'type' => 'int',
+			),
+
+			'odgovor_4' => array (
+				'description' => 'Answer to #4 question',
+				'type' => 'int',
+			),
+
+			'odgovor_5' => array (
+				'description' => 'Answer to #5 question',
+				'type' => 'int',
+			),
+
+			/* XXX: More information needed? */
+
+			'preferred' => array (
+				'description' => 'Preferred gift',
+				'type' => 'varchar',
+				'length' => 255,
+			),
+		),
+
+		'primary key' => array ('user_id'),
+
+	);
+	}
+
+	if (!db_table_exists ('chss_group')) {
+	$schema ['chss_group'] 	= array (
+		'description' => 'Group table',
+		'fields' => array (
+			'group_id' => array (
+				'description' => 'Unique id of the group',
+				'type' => 'serial',
+				'not null' => TRUE,
+			),
+
+			'group_name' => array (
+				'description' => 'Human-readable name of the group.',
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => TRUE,
+			),
+
+			'invite_message' => array (
+				'description' => 'Invite message.',
+				'type' => 'varchar',
+				'length' => 1024,
+				'not null' => TRUE,
+			),
+
+			'organizer_user_id' => array (
+				'description' => 'uid of the organizer of the group',
+				// references user->uid.
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => -1,
+			),
+
+			'group_status' => array (
+				'description' => 'Group status (closed, open, terminated)',
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => -1,
+			),
+
+			'closure_date' => array (
+				'description' => 'The group will not close before this day.',
+				'mysql_type' => 'datetime',
+				'type' => 'varchar',
+				'not null' => TRUE,
+			),
+
+			'gift_date' => array (
+				'description' => 'The date on which the gifts will be given.',
+				'type' => 'varchar',
+				'mysql_type' => 'datetime',
+				'not null' => TRUE,
+			),
+		),
+
+		'primary key' => array ('group_id'),
+	);
+	}
+
+	if (!db_table_exists ('chss_shuffle')) {
+		$schema ['chss_shuffle'] = array (
+			'description' => 'The actual order the gifts\' recipient and senders is stored here',
+			'fields' => array (
+				'group_id' => array (
+					'type' => 'int',
+					'not null' => TRUE,
+				),
+
+				'receiver_id' => array (
+					'type' => 'int',
+					'not null' => TRUE,
+				),
+
+				'sender_id' => array (
+					'type' => 'int',
+					'not null' => TRUE,
+				),
+			),
+		);
+	}
+
+	if (!db_table_exists ('chss_group_def')) {
+	$schema ['chss_group_def'] = array (
+		'description' => 'We store the people that actually joined a group here.',
+		'fields' => array (
+			'group_id' => array (
+				'description' => 'Group id',
+				'type' => 'int',
+				'not null' => TRUE,
+				// references chss_group -> group_id...
+			),
+
+			'user_id' => array (
+				'description' => 'uid that is IN this group.',
+				'type' => 'int',
+				'not null' => TRUE,
+				// references user->uid
+			),
+		)
+	);
+	}
+
+	if (!db_table_exists ('chss_book_hashes')) {
+
+	$schema ['chss_group_hashes'] = array (
+		'description' => 'Automatically generated one-time hashes for group introduction.',
+		'fields' => array (
+			'group_id' => array (
+				'description' => 'The group ID this hash is pertinent to.',
+				'type' => 'int',
+				'not null' => TRUE,
+				// references groupid...
+			),
+
+			'group_hash' => array (
+				'description' => 'The actual hash.',
+				'type' => 'varchar',
+				'length' => '33',
+				'not null' => TRUE,
+			),
+
+			'uid' => array (
+				'description' => 'uid that has used this hash, unless -1',
+				'type' => 'int',
+				'default' => -1,
+			),
+
+			'email' => array (
+				'description' => 'E-mail of the intented invitee',
+				'type' => 'varchar',
+				'length' => '512',
+				'not null' => TRUE,
+			),
+
+			'invitee_name' => array (
+				'description' => 'Name of the intented invitee',
+				'type' => 'varchar',
+				'length' => '512',
+				'not null' => TRUE,
+			),
+
+			'hash_status' => array (
+				'description' => 'The status of the hash. Has it been used yet?',
+				'type' => 'int',
+				'default' => 0,
+			),
+		),
+	);
+	}
+
+	return ($schema);
+}
+
+
+function chss_install () {
+	if (!db_table_exists ('chss_book_db'))
+		// Не би требало? Треба chss_schema прво да е повикана.. 
+		return;
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Infantil', 'title' => 'DE QUÉ COLOR ES TU SOMBRA (TAPA DURA)', 'author' => 'VALENZUELA, JOSE IGNACIO', 'isbn' => '9786071132505', 'age_min' => 3 , 'age_max' =>  6, 'genre' => 0, 'category' => 'Literatura Infantil', 'codewords' => 'Amistad, Habilidades Sociales y Escuela de Vida', 'phrase' => 'Un libro con el que descubirás que las diferencias hacen a los demás valiosos y respetables.', 'url' => 'http://www.gandhi.com.mx/de-que-color-es-tu-sombra-3', 'price' => 179, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Infantil', 'title' => 'EL PEOR DÍA DE MI VIDA', 'author' => 'HINOJOSA, FRANCISCO', 'isbn' => '9786071130228', 'age_min' => 5 , 'age_max' =>  8, 'genre' => 0, 'category' => 'Literatura Infantil', 'codewords' => 'Bullying, Amistad, Habilidades Sociales y Escuela de Vida', 'phrase' => 'Todos, alguna vez, hemos escuchado la frase: “ya sólo falta que me orine un perro”. Y es que siempre hay un día en el que no sólo te orina un perro, también un gato y un elefante.', 'url' => 'http://www.gandhi.com.mx/el-peor-dia-de-mi-vida-3', 'price' => 160, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Infantil', 'title' => 'DIARIO DE SOFÍA DESDE EL CUARTO DE BAÑO', 'author' => 'COOPER, ROSE', 'isbn' => '9786071110855', 'age_min' => 8 , 'age_max' => 12, 'genre' => 0, 'category' => 'Literatura Infantil', 'codewords' => 'Amistad, Habilidades Sociales y Escuela de Vida', 'phrase' => 'Fresco, ligero y bastante divertido.', 'url' => 'http://www.gandhi.com.mx/diario-de-sofia-desde-el-cuarto-de-ba-o-de-chicas-5', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Infantil', 'title' => '¡FELIZ CUMPLEAÑOS, PEPPA!', 'author' => 'PONS,IRENE', 'isbn' => '9786073125932', 'age_min' => 2 , 'age_max' =>  5, 'genre' => 0, 'category' => 'Literatura Infantil', 'codewords' => 'Amistad, Habilidades Sociales y Escuela de Vida', 'phrase' => 'Un libro donde los más pequeños se divertiran durante horas difrazando a Peppa y sus amigos. ', 'url' => '', 'price' => 49, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Infantil', 'title' => 'DIARIO DE CHARLIE SMALL 1. LA CIUDAD DE', 'author' => 'SMALL,CHARLIE', 'isbn' => '9788416119226', 'age_min' => 8 , 'age_max' => 12, 'genre' => 1, 'category' => 'Literatura Infantil', 'codewords' => 'Amistad, Habilidades Sociales y Escuela de Vida', 'phrase' => 'Atrapará a esos chicos que no les gusta leer. Una excelente introducción al mundo de la lectura.  ', 'url' => 'http://www.gandhi.com.mx/diario-de-charlie-small-1-la-ciudad-de-los-gorilas', 'price' => 129, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'ULTIMA LAGRIMA, LA', 'author' => 'LAUREN, KATE', 'isbn' => '9786073125901', 'age_min' => 12, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Romance Paranormal, Magia y Misterio ', 'phrase' => 'Una historia llena de magia oscura, misterio y una chica con el poder de cambiar al mundo por completo. ', 'url' => 'http://www.gandhi.com.mx/la-ultima-lagrima-2', 'price' => 289, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'HEROES DEL OLIMPO 1, LOS', 'author' => 'RIORDAN, RICK', 'isbn' => '9786073117081', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Aventura, Fantasía, Mitología y Magia  ', 'phrase' => 'Una aventura llena de giros inesperados y momentos llenos de suspenso. ', 'url' => 'http://www.gandhi.com.mx/los-heroes-del-olimpo-1-el-heroe-perdido', 'price' => 259, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'SELECCION, LA', 'author' => 'CASS,KIERA', 'isbn' => '9788499186078', 'age_min' => 12, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Distopía, Romance, Triangulo Amoroso y Concurso', 'phrase' => 'Un libro con un mundo lleno de contrastes donde la protagonista tendrá que elegir entre la vida que siempre quizo tener y la que jamás imaginó desear. ', 'url' => 'http://www.gandhi.com.mx/la-seleccion-1', 'price' => 209, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'CIUDADES DE PAPEL', 'author' => 'GREEN,JOHN', 'isbn' => '9786073124003', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'John Green, Primer Amor, Pistas y Crecimiento personal', 'phrase' => 'Una historia que nos invita a reflexionar sobre el contraste entre la idea que tenemos de las personas y lo que éstas son en realidad.', 'url' => 'http://www.gandhi.com.mx/ciudades-de-papel', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'BAJO LA MISMA ESTRELLA', 'author' => 'GREEN,JOHN', 'isbn' => '9786073114233', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'John Green, Romance, Humor y Muerte ', 'phrase' => 'La historia de amor del año. Una representación extraordinaria de dos jóvenes cuya vida se ve cambiada por el cáncer. Una historia que ha marcado a toda una generación. ', 'url' => 'http://www.gandhi.com.mx/bajo-la-misma-estrella-2', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'PIRAMIDE ROJA, LA - 1', 'author' => 'RIORDAN, RICK', 'isbn' => '9786073108010', 'age_min' => 10, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Supernatural, Mitología, Humor y Aventura', 'phrase' => 'Un libro divertido, lleno de aventuras y los misterios de la civilización egipcia. Donde el destino del mundo es una carrera contrareloj. ', 'url' => 'http://www.gandhi.com.mx/las-cronicas-de-kane-1-la-piramide-roja', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'RUBI - 1', 'author' => 'GIER, KERSTIN', 'isbn' => '9786073103718', 'age_min' => 10, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Romance, Aventura, Viajar en el Tiempo y Magia ', 'phrase' => 'Un viaje atraves del tiempo de la mano de un chico totalmente insportable pero increíblemente guapo. ', 'url' => 'http://www.gandhi.com.mx/rubi-1', 'price' => 259, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'HALO', 'author' => 'ADORNETTO, ALEXANDRA', 'isbn' => '9788499181745', 'age_min' => 12, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Angeles, Romance Paranormal, Magia y Misterio ', 'phrase' => 'Un romance prohíbido por leyes terranales y leyes divinas. ', 'url' => 'http://www.gandhi.com.mx/halo-1', 'price' => 279, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'MEMORIAS DE UN AMIGO IMAGINARIO', 'author' => 'DICKS, MATTHEW', 'isbn' => '9786073119207', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Ficción, Humor, Suspenso, y Crossover ', 'phrase' => 'Un libro que nos hará reflexionar sobre el mundo de la imaginación de una manera extraordinaria. ', 'url' => 'http://www.gandhi.com.mx/memorias-de-un-amigo-imaginario-3', 'price' => 229, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'LECCION DE AUGUST, LA', 'author' => 'PALACIO, R. J.', 'isbn' => '9786073114226', 'age_min' => 10, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Bullying, Crossover, Aceptación y Crecimiento Personal', 'phrase' => 'Una historia que habla acerca de la importancia de aceptarnos a nosotros mismos, enfrentar las adversidades y sonreírle a los días grises. ', 'url' => 'http://www.gandhi.com.mx/la-leccion-de-august-3', 'price' => 259, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'Y SI QUEDAMOS COMO AMIGOS', 'author' => 'EULBERG, ELIZABETH', 'isbn' => '9786071133458', 'age_min' => 12, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Amistad, Amor, Dos Puntos de Vista y Crecimiento Personal ', 'phrase' => 'Un libro que cuestiona si los hombres y las mujeres pueden en verdad ser solo amigos. ', 'url' => 'http://www.gandhi.com.mx/y-si-quedamos-como-amigos-2', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'ELEANOR & PARK', 'author' => 'ROWELL, RAINBOW', 'isbn' => '9786071128645', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Amor, Amistad, Romance y Musica ', 'phrase' => 'Una historia de amor inigualable al ritmo del punk rock de los 80s. ', 'url' => 'http://www.gandhi.com.mx/3160', 'price' => 229, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'VENTAJAS DE SER INVISIBLE, LAS', 'author' => 'CHBOSKY, STEPHEN', 'isbn' => '9786071121639', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Amistad, Drogas, Alcohol y Aceptacion ', 'phrase' => 'Una historia acerca de la amistad, la aceptación de uno mismo y las adversidades que conlleva  crecer. ', 'url' => 'http://www.gandhi.com.mx/las-ventajas-de-ser-invisible-3', 'price' => 209, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'GHOSTGIRL', 'author' => 'HURLEY, TONYA', 'isbn' => '9786071101853', 'age_min' => 10, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Paranormal, Fantasmas, Fantasía y Humor', 'phrase' => 'Una historia que nos demuestra que tan peligrosa puede ser la popularidad. ', 'url' => 'http://www.gandhi.com.mx/337', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'HIJA DE HUMO Y HUESO', 'author' => 'TAYLOR, LAINI', 'isbn' => '9786071116963', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Romance Paranormal, Aventura, Suspenso  y Magia', 'phrase' => 'Una aventura única en su tipo, llena de suspenso, demonios y angeles como nunca los has imaginado. ', 'url' => 'http://www.gandhi.com.mx/hija-de-humo-y-hueso-4', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'MALAMOR 1 HACIA EL FIN DEL MUNDO', 'author' => 'VALENZUELA, JOSE IGNACIO', 'isbn' => '9786071110893', 'age_min' => 12, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Amistad, Magia, Romance y Misterio ', 'phrase' => 'Una histotoria acerca de lo importante que es la amistad y el hecho de ser capaces de amar. ', 'url' => 'http://www.gandhi.com.mx/trilogia-del-malamor-hacia-el-fin-del-mundo-3', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'FANGIRL', 'author' => 'ROWELL, RAINBOW  ', 'isbn' => '9786071134653', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Aceptacion, Romance, Crecimiento Personal y Humor', 'phrase' => 'La historia de una chica que ama los libros más que tú.', 'url' => 'http://www.gandhi.com.mx/fangirl-2', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => '100, LOS', 'author' => 'MORGAN, KASS', 'isbn' => '9786071134196', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Distopía, Suspenso, Misterio y Sobrevivir ', 'phrase' => 'La aventura más peligrosa en una tierra sin humanos después de la Apocalipsis. ', 'url' => 'http://www.gandhi.com.mx/los-100-1', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'ÚLTIMA PRINCESA, LA', 'author' => 'CRAZE, GALAXY', 'isbn' => '9786071134547', 'age_min' => 10, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Distopía, Venganza, Suspenso y Romance', 'phrase' => 'Un libro en una Inglaterra destruída tras 17 días de desastres naturales donde tras sobrevivir el asesinato de la monarquía la última princesa se unirá a las fuerzas rebeldes en busqueda de venganza. ', 'url' => 'http://www.gandhi.com.mx/la-ultima-princesa-3', 'price' => 229, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/Juvenil', 'title' => 'ZOMBIS, CANÍBALES Y OTRAS MUERTES', 'author' => 'TRUEBA, JOSE LUIS', 'isbn' => '9786071134226', 'age_min' => 14, 'age_max' => 100, 'genre' => 0, 'category' => 'Literatura Juvenil', 'codewords' => 'Zombis, Apocalipsis, Muerte y Violencia ', 'phrase' => 'La historia de un México durante la apocalipsis zombie. ', 'url' => 'http://www.gandhi.com.mx/zombis-canibales-y-otras-muertes-1', 'price' => 199, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'AVE DEL PARAISO', 'author' => 'CAROL OTES, JOYCE', 'isbn' => '9786071133717', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Thriller ', 'codewords' => 'Asesinato, Suspenso, Adulterio y Misterio ', 'phrase' => 'Un asesinato brutal donde el esposo y el amante son los principales sospechosos del crímen. ', 'url' => 'http://www.gandhi.com.mx/ave-del-paraiso-4', 'price' => 159, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'PUEDO EXPLICARLO TODO', 'author' => 'VELASCO, XAVIER', 'isbn' => '9786071134257', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción ', 'codewords' => 'Humor, Amistad, Crecimiento Personal y Realista', 'phrase' => 'Una visión ácida acerca de los libros de autoayuda. ', 'url' => 'http://www.gandhi.com.mx/puedo-explicarlo-todo-4', 'price' => 199, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'LIBRO ROJO DEL FENG SHUI, EL', 'author' => 'LIN, IRMA', 'isbn' => '9786071134264', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Esoterismo ', 'codewords' => 'Feng Shui, Equilibro, Armonía y Prosperidad', 'phrase' => 'Los secretos de la diciplina oriental en consejos fáciles de seguir para llenar tu vida de abundancia y prosperidad. ', 'url' => 'http://www.gandhi.com.mx/el-libro-rojo-del-feng-shui-1', 'price' => 179, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'CLUB DE LOS CORAZONES SOLITARIOS-BOL', 'author' => 'EULBERG, ELIZABETH ', 'isbn' => '9786071133748', 'age_min' => 16, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Desamor, Amistad, Aceptacion y Romance', 'phrase' => 'La historia acerca de una chica que se jura a ella misma no volver a amar. ', 'url' => 'http://www.gandhi.com.mx/el-club-de-los-corazones-solitarios-3', 'price' => 139, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => '¿POR QUÉ CAMINAR SI PUEDES VOLAR?(BOL)', 'author' => 'ISHA', 'isbn' => '9786071133540', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Autoayuda ', 'codewords' => 'Aceptacion, Equilibrio, Paz y Armonía', 'phrase' => 'Descubre el sistema de Isha para lograr un crecimiento interior, descubrir la paz interior y el amor a uno mismo. ', 'url' => 'http://www.gandhi.com.mx/por-que-caminar-si-puedes-volar-4', 'price' => 119, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'ACTUA COMO DAMA PERO PIENSA COMO HOMBRE(', 'author' => 'HARVEY, STEVE', 'isbn' => '9786071133069', 'age_min' => 16, 'age_max' => 100, 'genre' => 2, 'category' => 'Autoayuda ', 'codewords' => 'Amor, Relaciones Sexuales, Atracción y Romance', 'phrase' => 'La guía máxima para conquistar a cualquier hombre.', 'url' => 'http://www.gandhi.com.mx/actua-como-dama-pero-piensa-como-hombre-2', 'price' => 139, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'DESAFÍO STARBUCKS, EL(BOL)', 'author' => 'SCHULTZ, HOWARD', 'isbn' => '9786071132215', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Empresa y Gestion ', 'codewords' => 'Emprendimiento, Negocios, Éxito y Empresas', 'phrase' => 'Una lección magistral de liderazgo que se puede aplicar a todos los ámbitos de la vida', 'url' => 'http://www.gandhi.com.mx/el-desafio-starbucks-3', 'price' => 159, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'NOCTURNA (BOL)', 'author' => 'DEL TORO, GUILLERMO', 'isbn' => '9786071125873', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Thriller ', 'codewords' => 'Suspenso, Supernatural, Misterio y Terror', 'phrase' => '  La  novela más perversa e innovadora que puedas soñar. Una estirpe maldita se propaga por el mundo, y tu tienes algo bajo la piel que les vuelve locos. Desearás que sólo sea un cuento…', 'url' => 'http://www.gandhi.com.mx/nocturna-1', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'CAIN (BOL)', 'author' => 'SARAMAGO, JOSE', 'isbn' => '9786071111104', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción ', 'codewords' => 'Aventura, Religión, Viaje en el Tiempo y Humor ', 'phrase' => 'Un irónico y mordaz recorrido en el que el lector asiste a una guerra secular, y en cierto modo, involuntaria, entre el creador y su criatura.', 'url' => 'http://www.gandhi.com.mx/cain-7', 'price' => 109, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'COMER, REZAR, AMAR (BOL)', 'author' => 'GILBERT, ELIZABETH', 'isbn' => '9786071105806', 'age_min' => 16, 'age_max' => 100, 'genre' => 2, 'category' => 'Ficción ', 'codewords' => 'Aceptacion, Romance, Crecimiento Personal y Humor', 'phrase' => 'Comer, rezar, amar trata de lo que ocurre cuando decidimos ser autores de nuestra felicidad y dejamos de intentar vivir según los modelos que nos imponen.', 'url' => 'http://www.gandhi.com.mx/comer-rezar-amar-bol-1', 'price' => 139, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'INTERMITENCIAS DE LA MUERTE. LAS (BOL)', 'author' => 'SARAMAGO, JOSE', 'isbn' => '9789708120135', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción', 'codewords' => 'Inmortalidad, Humor, Muerte y Romance', 'phrase' => 'En un país indeterminado, la muerte decide suspender su trabajo y la gente deja de morir. ', 'url' => '', 'price' => 119, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'HISTORIA INTERMINABLE, LA (MAXI)', 'author' => 'ENDE, MICHAEL', 'isbn' => '9789707311374', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción', 'codewords' => 'Amistad, Suspenso, Aventura y Magia', 'phrase' => 'Un libro acerca de un mundo mágico que corre peligro y cuya salvación es un chico del mundo real. ', 'url' => '', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'EVANGELIO SEGUN JESUCRISTO FG -PDL', 'author' => 'SARAMAGO, JOSE', 'isbn' => '9789707311299', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción', 'codewords' => 'Aventura, Religión, Historia y Humor ', 'phrase' => 'Una visión mundana de los hechos relativos al nazareno.', 'url' => '', 'price' => 174, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'RAYUELA - FG', 'author' => 'CORTAZAR, JULIO', 'isbn' => '9789707311183', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción ', 'codewords' => 'Monólogo  Interior, Surrealismo y Crecimiento Personal', 'phrase' => ' Rayuela es un viaje en el tiempo, un clásico y una obra inigualable en su tipo. ', 'url' => '', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'ENSAYO SOBRE LA CEGUERA -FG PDL- NOBEL 1', 'author' => 'SARAMAGO, JOSE', 'isbn' => '9789707311152', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción ', 'codewords' => 'Misterio, Suspenso, Sociedad y Psicología ', 'phrase' => ' La ficción de un autor que nos alerta sobre la responsabilidad de tener ojos cuando otros los perdieron.', 'url' => '', 'price' => 165, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'LADRONA DE LIBROS (PELICULA)', 'author' => 'ZUSAK, MARKUS', 'isbn' => '9786073120319', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción Historica', 'codewords' => 'Segunda Guerra Mundial, Amistad y Muerte ', 'phrase' => 'La historia de una chica que quería leer para poder así escapar de los horrores de la Segunda Guerra Mundial. ', 'url' => 'http://www.gandhi.com.mx/ladrona-de-libros', 'price' => 199, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => '7 HABITOS DE LOS ADOLESCENTES, LOS', 'author' => 'COVEY,SEAN', 'isbn' => '9789707802735', 'age_min' => 12, 'age_max' => 100, 'genre' => 0, 'category' => 'Autoayuda ', 'codewords' => 'Crecimiento Personal, Aceptacion, Madurez y Responsabilidad', 'phrase' => 'Una guía para vivir la juventud de una manera plena, feliz, satisfactoria y repleta de éxitos. ', 'url' => '', 'price' => 169, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'MONJE QUE VENDIO SU FERRARI, EL', 'author' => 'SHARMA, ROBIN S.', 'isbn' => '9786073108072', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Autoayuda ', 'codewords' => 'Espiritualdiad, Crecimiento Personal, Paz Interior y Armonía', 'phrase' => 'Un relato donde nos dicen lo importante que es vivir teniendo una dirección clara, pasión y armonía en el interior. ', 'url' => 'http://www.gandhi.com.mx/el-monje-que-vendio-su-ferrari-3', 'price' => 159, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'TUS ZONAS ERRONEAS', 'author' => 'DYER, WAYNE W.', 'isbn' => '9786073103381', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Autoayuda ', 'codewords' => 'Superación, Crecimiento Personal, Armonía y Paz Interior ', 'phrase' => 'Un libro que te enseña a mejorar poco a poco y ser cada día más feliz. ', 'url' => 'http://www.gandhi.com.mx/4306', 'price' => 179, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'CUPULA, LA', 'author' => 'KING,STEPHEN', 'isbn' => '9786073119993', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Thriller ', 'codewords' => 'Terror, Suspenso, Misterio y  Claustrofobia ', 'phrase' => 'La terrorifíca historia acerca de un pueblo que queda atrapado bajo una cúpula indestructible. ', 'url' => 'http://www.gandhi.com.mx/la-cupula-3', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'CARRIE   (PELICULA)', 'author' => 'KING,STEPHEN', 'isbn' => '9786073118453', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Thriller ', 'codewords' => 'Bullying, Terror, Locura y Muerte', 'phrase' => 'La inquietante novela acerca de una chica que haciendo uso de sus poderes telequinecticos se venga de las burlas de sus compañeros.', 'url' => 'http://www.gandhi.com.mx/carrie-edicion-de-pelicula', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'QUIEREME CINCO MINUTOS', 'author' => 'LOPEZ, ANAI', 'isbn' => '9786073106061', 'age_min' => 12, 'age_max' => 100, 'genre' => 2, 'category' => 'Literatura Juvenil', 'codewords' => 'Romance, Crecimiento Personal, Amistad y Humor', 'phrase' => 'Una historia que trata acerca del primer amor y de el viaje caótico, divertido y horripilante que es la adolecencia. ', 'url' => 'http://www.gandhi.com.mx/quiereme-cinco-minutos-3', 'price' => 139, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'IT (ESO)', 'author' => 'KING,STEPHEN', 'isbn' => '9786073105521', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Thriller ', 'codewords' => 'Terror, Muerte, Suspenso y Asesinatos ', 'phrase' => 'El terror toma nombre y forma en esta historia donde unos chicos destruyen un mal responsable de varios asesinatos en su pueblo. No contaban con que ese mal regresaría más letal, peligroso y sediento de venganza. ', 'url' => 'http://www.gandhi.com.mx/it-eso', 'price' => 349, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'PSICOMAGIA', 'author' => 'JODOROWSKY, ALEJANDRO', 'isbn' => '9786073108041', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Esoterismo ', 'codewords' => 'Sanación Espiritual, Armonía, Paz Interior, y Misticismo ', 'phrase' => 'Un libro que le enseña al lector un tipo de medicina alternativa basada en el arte y la belleza. ', 'url' => 'http://www.gandhi.com.mx/psicomagia-3', 'price' => 179, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'FLORES EN EL ATICO', 'author' => 'ANDREWS, V.C.', 'isbn' => '9786073107679', 'age_min' => 16, 'age_max' => 100, 'genre' => 2, 'category' => 'Fantasía Romántica', 'codewords' => 'Horror, Misterio, Familia y Abuso ', 'phrase' => 'La primera parte de una saga  de la familia Dollanganger. Un relato acerca de la terrible experiencia vivida por 4 niños aislados del mundo por una madre cruel. ', 'url' => 'http://www.gandhi.com.mx/2839', 'price' => 209, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'PILARES DE LA TIERRA, LOS', 'author' => 'FOLLETT,KEN', 'isbn' => '9786073107419', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción Historica', 'codewords' => 'Historia, Arquitectura,  Suspenso y Romance', 'phrase' => 'Una apasionante historia alrededor de la construcción de la primera catedral gótica en Inglaterra. ', 'url' => 'http://www.gandhi.com.mx/los-pilares-de-la-tierra-3', 'price' => 349, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'CASA DE LOS ESPIRITUS, LA', 'author' => 'ALLENDE, ISABEL', 'isbn' => '9786073104562', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Fantasía Contemporanea', 'codewords' => 'Amor, Familia, Muerte y Fantasmas', 'phrase' => 'La historia de  unos personajes atrapados en un entorno sorprendente y exótico. ', 'url' => 'http://www.gandhi.com.mx/la-casa-de-los-espiritus-7', 'price' => 209, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'FICCIONES', 'author' => 'BORGES,JORGE LUIS', 'isbn' => '9786073104920', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción Contemporanea', 'codewords' => 'Realismo, Amistad, Crimenes y Suspenso ', 'phrase' => 'La colección de los cuentos de Borges en un solo libro. ', 'url' => 'http://www.gandhi.com.mx/3346', 'price' => 139, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'NOMBRE DE LA ROSA, EL', 'author' => 'ECO, UMBERTO', 'isbn' => '9786073103008', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción Historica', 'codewords' => 'Misterio, Historia, Religion, Muerte', 'phrase' => 'Una apasionante historia acerca de las muertes en un  monasterio en la época de la inquisición.', 'url' => 'http://www.gandhi.com.mx/4890', 'price' => 279, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'AVENTURA DE PENSAR, LA', 'author' => 'SAVATER,FERNANDO', 'isbn' => '9786073100878', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Filosofía', 'codewords' => 'Historia, Filosofía, Evolución del Pensamiento y Armonía', 'phrase' => 'Un ensayo acerca de los pensadores más importantes del mundo y de la evolución del pensamiento. ', 'url' => 'http://www.gandhi.com.mx/la-aventura-de-pensar', 'price' => 179, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'OCHO, EL', 'author' => 'NEVILLE, KATHERINE', 'isbn' => '9789708102025', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción  Historica', 'codewords' => 'Historia, Suspenso, Aventura y Misterio ', 'phrase' => 'La historia de las míticas piezas de ajedrez de Montglane que ocultan un secreto que ha sido celosamente perservado durante siglos. ', 'url' => 'http://www.gandhi.com.mx/el-ocho-3', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'EJECUTIVO AL MINUTO, EL', 'author' => 'BLANCHARD, KENNETH', 'isbn' => '9789707808010', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Empresa y Gestion ', 'codewords' => 'Productividad, Empresa, Éxito y Negocios ', 'phrase' => 'Un libro de de lectura fácil y amena, enseña técnicas prácticas de gestión empresarial, y muestra cómo métodos aparentemente sencillos resultan de la mayor eficacia.', 'url' => 'http://www.gandhi.com.mx/el-ejecutivo-al-minuto', 'price' => 114, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'TUMBA, LA (ANIVERSARIO)', 'author' => 'AGUSTIN, JOSE', 'isbn' => '9786073126526', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción ', 'codewords' => 'Amistad, Romance, Desesperación y Muerte', 'phrase' => 'Un libro que marcó a una generación con su  espíritu rebelde, desencantado y mordaz.', 'url' => 'http://www.gandhi.com.mx/la-tumba-edicion-de-aniversario', 'price' => 129, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'PERDIDA', 'author' => 'FLYNN,GILLIAN', 'isbn' => '9786073123730', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción ', 'codewords' => 'Suspenso, Muerte, Matrimonio y Misterio ', 'phrase' => 'La intrigante historia acerca de los secretos de una pareja que parecía tenerlo todo. ', 'url' => 'http://www.gandhi.com.mx/perdida-5', 'price' => 199, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Jime/DeBolsillo', 'title' => 'LIBRO DE LA COMPRENSION, EL', 'author' => 'OSHO', 'isbn' => '9786073123389', 'age_min' => 16, 'age_max' => 100, 'genre' => 0, 'category' => 'Autoayuda ', 'codewords' => 'Crecimiento Personal, Aceptacion, Armonía y Paz Interior ', 'phrase' => 'Una invitación a tener una vida plena, armoniosa y feliz. ', 'url' => 'http://www.gandhi.com.mx/el-libro-de-la-comprension-3', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'JUEGO DE RIPPER, EL ', 'author' => 'ISABEL ALLENDE', 'isbn' => '9786073120272', 'age_min' => 20, 'age_max' => 45, 'genre' => 2, 'category' => 'FICCIÓN MODERNA Y CONTEMPORÁNEA (DESPUÉS DE 1945)', 'codewords' => 'Isabel Allende; Thriller; Novela negra', 'phrase' => 'Las estrellas siempre dicen la verdad', 'url' => 'http://www.gandhi.com.mx/el-juego-de-ripper-3', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'BESO MAS PEQUEÑO, EL', 'author' => 'MALZIEU, MATHIAS', 'isbn' => '9786073120302', 'age_min' => 17, 'age_max' => 5 , 'genre' => 2, 'category' => 'Ficción moderna y contemporánea', 'codewords' => 'Beso, desaparecer, amor', 'phrase' => '¿Cuando encontramos al amor de nuestra vida, sabemos retenerlo?', 'url' => 'http://www.gandhi.com.mx/el-beso-mas-peque-o-3', 'price' => 139, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'RESTAURADORA, LA', 'author' => ' STEVENS, AMANDA', 'isbn' => '9788499188485', 'age_min' => 17, 'age_max' => 25, 'genre' => 2, 'category' => 'FICCIÓN MODERNA Y CONTEMPORÁNEA (DESPUÉS DE 1945)', 'codewords' => 'Misterio; fantasmas; thriller', 'phrase' => 'Intrigante y romántica, totalmente inesperada', 'url' => 'http://www.gandhi.com.mx/la-restauradora-5', 'price' => 269, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'CEVDET BEY E HIJOS ', 'author' => 'PAMUK, ORHAN', 'isbn' => '9786073122306', 'age_min' => 25, 'age_max' => 100 , 'genre' => 1, 'category' => 'Ficción moderna y contemporánea', 'codewords' => 'familia, negocios, Estambul', 'phrase' => 'Al estilo de las sagas familiares del siglo XIX, Cevdet Bey e hijos cubre tres generaciones  y narra la historia íntima de Turquía', 'url' => 'http://www.gandhi.com.mx/cevdet-bey-e-hijos-3', 'price' => 349, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'CEREBRO DE PAN', 'author' => 'PERLMUTTER, DAVID', 'isbn' => '9786073122627', 'age_min' => 20, 'age_max' => 100, 'genre' => 0, 'category' => 'MEDICINA POPULAR Y SALUD', 'codewords' => 'Dieta; salud; nutrición', 'phrase' => 'La sorprendente VERDAD sobre … los azúcares, colesterol y trigo en tu CEREBRO', 'url' => 'http://www.gandhi.com.mx/2430', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'COLORES DEL AMOR, LOS', 'author' => 'VELASCO, KARINA ', 'isbn' => '9786073122603', 'age_min' => 30, 'age_max' => 40, 'genre' => 2, 'category' => 'MENTE, CUERPO Y ESPÍRITU', 'codewords' => 'Amor; energía; armonía', 'phrase' => 'El amor no es blanco y negro: es un arcoíris que nos invita a experimentar.', 'url' => 'http://www.gandhi.com.mx/los-colores-del-amor-3', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'JILGUERO, EL ', 'author' => 'TARTT, DONNA ', 'isbn' => '9786073123068', 'age_min' => 25, 'age_max' => 45, 'genre' => 0, 'category' => 'Ficción moderna y contemporánea después de 1945', 'codewords' => 'Museo, atentado, cuadro, madre', 'phrase' => '"Una de las historias más hermosas contadas en los últimos años»
+Rolling Stone
+', 'url' => 'http://www.gandhi.com.mx/el-jilguero-3', 'price' => 399, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'SECRETO R. CONSPIRACION 2014', 'author' => 'MENDIVILL, LEOPOLDO ', 'isbn' => '9786073123808', 'age_min' => 25, 'age_max' => 35, 'genre' => 1, 'category' => 'FICCIÓN HISTÓRICA', 'codewords' => 'Gobierno; política; Kennedy ', 'phrase' => 'Una organización secreta gobierna el mundo y a México desde hace más de 50 años…', 'url' => 'http://www.gandhi.com.mx/secreto-r-conspiracion-2014', 'price' => 269, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'PILARES DE LA TIERRA, LOS (EDICION CONMEMORATIVA)', 'author' => 'FOLLETT, KEN', 'isbn' => '9786073123488', 'age_min' => 30, 'age_max' => 45, 'genre' => 0, 'category' => 'FICCIÓN HISTÓRICA', 'codewords' => 'Edad Media; Inglaterra; historia', 'phrase' => 'Se conmemora los 25 años de Los Pilares de la Tierra con edición aniversario con nueva introducción del autor ', 'url' => 'http://www.gandhi.com.mx/los-pilares-de-la-tierra-edicion-de-25-aniversario', 'price' => 399, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'ADULTERIO', 'author' => 'COELHO, PAULO', 'isbn' => '9786073124904', 'age_min' => 20, 'age_max' => 45, 'genre' => 0, 'category' => 'FICCIÓN MODERNA Y CONTEMPORÁNEA (DESPUÉS DE 1945)', 'codewords' => 'Paulo Coelho; amor; engaño', 'phrase' => 'La novela más provocativa de Paulo Coelho', 'url' => 'http://www.gandhi.com.mx/adulterio', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'UMBRAL DE LA ETERNIDAD, EL   ', 'author' => 'FOLLETT, KEN ', 'isbn' => '9786073125734', 'age_min' => 30, 'age_max' => 45, 'genre' => 1, 'category' => 'FICCIÓN MODERNA Y CONTEMPORÁNEA (DESPUÉS DE 1945)', 'codewords' => 'Ken Follet; The Century; historia; Siglo XX', 'phrase' => 'El esperado desenlace de la trilogía THE CENTURY', 'url' => 'http://www.gandhi.com.mx/2559', 'price' => 399, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'CREAR O MORIR ', 'author' => 'OPPENHEIMER, ANDRES ', 'isbn' => '9786073125772', 'age_min' => 30, 'age_max' => 100, 'genre' => 1, 'category' => 'Gestión, liderazgo y motivación', 'codewords' => 'Innovación, crear, proponer', 'phrase' => 'La esperanza de latinoamerica y las 5 claves de la innovación', 'url' => 'http://www.gandhi.com.mx/1448', 'price' => 289, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'MAUS', 'author' => 'SPIEGELMAN, ART', 'isbn' => '9786073125819', 'age_min' => 18, 'age_max' => 100, 'genre' => 0, 'category' => 'Novelas gráficas', 'codewords' => 'Sobreviviente, holocausto, judio', 'phrase' => 'Maus es una exploración facinante de una tragedia.', 'url' => 'http://www.gandhi.com.mx/maus-la-radicalidad-narrativa-de-esta-obra-marca-un-antes-y-un-despues-en-la-novela-grafica', 'price' => 349, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'SEXO Y AMOR EN TIEMPOS DE CRISIS', 'author' => 'CACHO, LYDIA', 'isbn' => '9786073118941', 'age_min' => 40, 'age_max' => 100, 'genre' => 0, 'category' => 'SALUD Y DESARROLLO PERSONAL', 'codewords' => 'Andropausia; menopausia; amor', 'phrase' => 'Lo que debes saber antes de cumplir 40', 'url' => 'http://www.gandhi.com.mx/sexo-y-amor-en-tiempos-de-crisis-lo-que-debes-saber-antes-de-cumplir-40', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'ESTE AÑO ME VALE MADRES, EL CALENDARIO ETERNO DE PREM DAYAL', 'author' => 'DAYAL, PREM', 'isbn' => '9786073126298', 'age_min' => 20, 'age_max' => 40, 'genre' => 0, 'category' => 'AUTOAYUDA Y DESARROLLO PERSONAL', 'codewords' => 'Prem Dayal; mantras; agenda ', 'phrase' => 'El calendario eterno de Prem Dayal', 'url' => 'http://www.gandhi.com.mx/este-a-o-me-vale-madres-el-calendario-eterno-de-prem-dayal', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'LEOPARDO, EL', 'author' => 'NESBO, JO', 'isbn' => '9786073126434', 'age_min' => 20, 'age_max' => 100, 'genre' => 0, 'category' => 'Género policiaco y de misterio', 'codewords' => 'Adictivo, asesino, sangre', 'phrase' => 'Solo hay una palabra capaz de describirlo: Adicitivo', 'url' => 'http://www.gandhi.com.mx/el-leopardo-1', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'ADIOS A LOS PADRES', 'author' => 'AGUILAR CAMIN, HECTOR', 'isbn' => '9786073126892', 'age_min' => 30, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción moderna y contemporánea después de 1945', 'codewords' => 'Familia, secretos, perdón', 'phrase' => 'Una novela inesperada, estraña y familiar como la vida misma.', 'url' => 'http://www.gandhi.com.mx/adios-a-los-padres-1', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'VOLUNTAD DE ACERO', 'author' => 'FERRARA, PABLO', 'isbn' => '9786073127547', 'age_min' => 25, 'age_max' => 35, 'genre' => 0, 'category' => 'BIOGRAFÍA E HISTORIAS REALES', 'codewords' => 'Esclerosis; triatlón; amistad', 'phrase' => 'Las reglas cambian, la aventura continúa, rendirse no es opción ', 'url' => '', 'price' => 289, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'MUSICA DEL SILENCIO, LA', 'author' => 'ROTHFUSS, PATRICK', 'isbn' => '9786073127042', 'age_min' => 17, 'age_max' => 25, 'genre' => 0, 'category' => 'FANTASÍA', 'codewords' => 'Fantasía; Auri; Rothfuss', 'phrase' => 'El mundo a través de los ojos del entrañable personaje de la trilogía Crónica del asesino de Reyes, Auri', 'url' => '', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'MR. MERCEDES', 'author' => 'KING,STEPHEN', 'isbn' => '9786073126977', 'age_min' => 20, 'age_max' => 40, 'genre' => 0, 'category' => 'OBRA DE MISTERIO Y SUSPENSE', 'codewords' => 'Stephen King; thriller; misterio', 'phrase' => 'Un thriller sin par del gran maestro Stephen King.', 'url' => '', 'price' => 399, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'CINCUENTA SOMBRAS DE GREY ', 'author' => 'JAMES, E.L.', 'isbn' => '9786073110969', 'age_min' => 20, 'age_max' => 100, 'genre' => 2, 'category' => 'NARRATIVA ROMÁNTICA ADULTA Y CONTEMPORÁNEA', 'codewords' => 'Jamie Dornan; Dakota Johnson; sexo', 'phrase' => 'El fenómeno literario del momento', 'url' => 'http://www.gandhi.com.mx/3618', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'LUNA DE SAL', 'author' => 'MEDINA, CARLA', 'isbn' => '9786071134479', 'age_min' => 17, 'age_max' => 25, 'genre' => 2, 'category' => 'NARRATIVA ROMÁNTICA', 'codewords' => 'Amor; mar; aprendizaje', 'phrase' => 'Porque el amor empieza cuando la marea crece', 'url' => 'http://www.gandhi.com.mx/luna-de-sal', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 1,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'DIOS SE FUE DE VIAJE', 'author' => 'RIVAS, BEATRIZ', 'isbn' => '9786071134042', 'age_min' => 20, 'age_max' => 100, 'genre' => 1, 'category' => 'Ficción histórica', 'codewords' => 'Libertad, mujer, amor', 'phrase' => '¿No será que Dios se ha ido a un largo viaje y no planea regresar?', 'url' => 'http://www.gandhi.com.mx/dios-se-fue-de-viaje-1', 'price' => 259, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'ASI EMPIEZA LO MALO', 'author' => 'MARIAS, JAVIER', 'isbn' => '9786071134462', 'age_min' => 25, 'age_max' => 45, 'genre' => 0, 'category' => 'Ficción moderna y contemporánea', 'codewords' => 'Deseo, mattrimonio, desdicha', 'phrase' => 'Una novela sobre el deseo, el rencor y la arbitrariedad del perdón.', 'url' => 'http://www.gandhi.com.mx/asi-empieza-lo-malo-1', 'price' => 319, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'LIBRO AGENDA PEQUEÑO CERDO CAPITALISTA 2015', 'author' => 'MACIAS, SOFIA', 'isbn' => '9786071133137', 'age_min' => 20, 'age_max' => 100, 'genre' => 0, 'category' => 'FINANZAS PERSONALES', 'codewords' => 'Finanzas; ahorro; agenda; dinero', 'phrase' => 'Arregla tu relajito financiero en 365 días', 'url' => 'http://www.gandhi.com.mx/libro-agenda-peque-o-cerdo-capitalista-2015', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'MIS SENTIMIENTOS ERRONEOS', 'author' => 'OLMEDO, SILVIA', 'isbn' => '9786071130686', 'age_min' => 15, 'age_max' => 100, 'genre' => 0, 'category' => 'CITAS, RELACIONES, CONVIVENCIA Y MATRIMONIO', 'codewords' => 'Depresión; duelo; felicidad', 'phrase' => '¿Sabías que la felicidad depende de ti?', 'url' => 'http://www.gandhi.com.mx/mis-sentimientos-erroneos', 'price' => 249, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'VIBRACION DEL AMOR, LA', 'author' => 'ISHA', 'isbn' => '9786071134790', 'age_min' => 25, 'age_max' => 35, 'genre' => 2, 'category' => 'AFIRMACIÓN PERSONAL, MOTIVACIÓN Y AUTOESTIMA', 'codewords' => 'Espiritual; amor; paz', 'phrase' => 'El camino espiritual más efectivo para amarnos y transmitirlo al universo', 'url' => 'http://www.gandhi.com.mx/la-vibracion-del-amor', 'price' => 229, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'EXTASIS. UNA NOVELA EN SIETE CAPSULAS', 'author' => 'KLEINBURG, GERARDO', 'isbn' => '9786071134813', 'age_min' => 18, 'age_max' => 100, 'genre' => 1, 'category' => 'Ficción moderna y contemporánea después de 1945', 'codewords' => 'Éxtasis, droga, viaje', 'phrase' => 'Siete historias que se funden en un sólo organismo vivo: una novela tan oscura como luminosa', 'url' => '', 'price' => 259, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'PANTALLAS DE PLATA', 'author' => 'FUENTES, CARLOS', 'isbn' => '9786071134493', 'age_min' => 20, 'age_max' => 100, 'genre' => 0, 'category' => 'Ensayo literario', 'codewords' => 'Cine, divas, espectador, hollywood', 'phrase' => 'Carlos Fuentes cuenta cómo fueron sus primeros acercamientos a las salas cinematográficas y su pasión por el cine. Pantallas de plata nos acerca a sus preferencias, gustos y obsesiones relacionados con el séptimo arte.', 'url' => '', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'OCTAVIO PAZ EN SU SIGLO', 'author' => 'DOMINGUEZ, CHRISTOPHER', 'isbn' => '9786071130662', 'age_min' => 25, 'age_max' => 35, 'genre' => 0, 'category' => 'BIOGRAFÍA E HISTORIAS REALES', 'codewords' => 'Biografía; Octavio Paz; Nobel', 'phrase' => 'El poeta, el ensayista, el hombre, las ideas: OCTAVIO PAZ', 'url' => '', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 5,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'DOBLE VIDA DE JESUS, LA', 'author' => 'SERNA, ENRIQUE', 'isbn' => '9786071135667', 'age_min' => 18, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción moderna y contemporánea después de 1945', 'codewords' => 'Política, narco,pasión', 'phrase' => 'Un thriller sobre el amor, la cobardía y el ansia de redención.', 'url' => '', 'price' => 289, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'AMARRES PERROS', 'author' => 'G. CASTAÑEDA, JORGE', 'isbn' => '9786071135384', 'age_min' => 30, 'age_max' => 100, 'genre' => 0, 'category' => 'BIOGRAFÍA E HISTORIAS REALES', 'codewords' => 'autobiografia, Confesiones, enemigos, Jorge G. Castañeda', 'phrase' => '"En mi manual, los enemigos personales son para toda la vida" Jorge G. Castañeda', 'url' => '', 'price' => 299, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'AMOR VERDADERO', 'author' => 'LOPEZ, JENNIFER', 'isbn' => '9786071134721', 'age_min' => 25, 'age_max' => 35, 'genre' => 0, 'category' => 'BIOGRAFÍA E HISTORIAS REALES', 'codewords' => 'Jennifer Lopez; Marc Anthony; famosos', 'phrase' => '«La historia de cómo descubrí el amor más verdadero de todos, de cómo enfrenté mis más grandes retos, superé mis mayores miedos y emergí más fuerte que nunca.»  Jennifer Lopez', 'url' => '', 'price' => 269, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'PADRE RICO, PADRE POBRE PARA JOVENES', 'author' => 'KIYOSAKI, ROBERT', 'isbn' => '9786071118820', 'age_min' => 20, 'age_max' => 30, 'genre' => 0, 'category' => 'FINANZAS PERSONALES', 'codewords' => 'Finanzas; ahorro; dinero', 'phrase' => 'Los secretos para ganar dinero que no te enseñan en la escuela', 'url' => '', 'price' => 219, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'ULTIMOS DIAS DE NUESTROS PADRES, LOS', 'author' => 'DICKER, JOËL', 'isbn' => '9786071135513', 'age_min' => 20, 'age_max' => 100, 'genre' => 0, 'category' => 'Ficción histórica', 'codewords' => 'espionaje, amor, amistad ', 'phrase' => ' Una novela sobre el amor, la amistad y una reflexión profunda sobre el ser humano y sus debilidades.', 'url' => '', 'price' => 279, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 7,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'STEVE JOBS . LECCIONES DE LIDERAZGO', 'author' => 'ISAACSON, WALTER', 'isbn' => '9786073125178', 'age_min' => 20, 'age_max' => 35, 'genre' => 0, 'category' => 'GESTIÓN: LIDERAZGO Y MOTIVACIÓN', 'codewords' => 'Steve Jobs; Apple; líder', 'phrase' => 'Los secretos para convertirse en un líder', 'url' => 'http://www.gandhi.com.mx/steve-jobs-lecciones-de-liderazgo', 'price' => 149, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 6,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 4,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'DIARIO DE UNA VOLATIL', 'author' => 'GUERRERO, AGUSTINA', 'isbn' => '9786073126823', 'age_min' => 20, 'age_max' => 100, 'genre' => 2, 'category' => 'Nóvelas gráficas', 'codewords' => 'mujer, vida, humor', 'phrase' => 'Un mundo entero de detalles chicos y grandes que hablan de ti, de mí y de todos nosotros.', 'url' => '', 'price' => 199, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 4,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 8,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'ATREVETE', 'author' => 'SEFCHOVICH, SARA', 'isbn' => '9786071134837', 'age_min' => 25, 'age_max' => 100, 'genre' => 2, 'category' => '', 'codewords' => 'inseguridad, delitos,  política', 'phrase' => 'Explica cómo se dan los fenómenos delictivos en México, cuál es la posición de los intelectuales y qué mecanismos de defensa ofrecen los gobiernos.', 'url' => '', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 6,))->execute ();
+
+$posledno = db_insert('chss_book_db')->fields (array ('responsible' => 'Andrea', 'title' => 'EL LADO FACIL DE LA GENTE DIFICIL', 'author' => 'CESAR LOZANO', 'isbn' => '9786071129185', 'age_min' => 26, 'age_max' => 100, 'genre' => 0, 'category' => 'AUTOAYUDA Y DESARROLLO PERSONAL', 'codewords' => 'Lozano,  conflictos', 'phrase' => 'Que la gente conflictiva no te amarge la vida', 'url' => 'http://www.gandhi.com.mx/el-lado-facil-de-la-gente-dificil', 'price' => 239, ))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 2,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 3,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 1, 'answer' => 5,))->execute ();
+
+db_insert ('chss_book_db_answers') -> fields (array ('book_id' => $posledno, 'question_id' => 2, 'answer' => 3,))->execute ();
+}

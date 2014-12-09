@@ -12,34 +12,40 @@ body {
 }
 
 @font-face {
+    font-family: Bebas;
+    src: url('fontz/BebasNeue.otf');
+}
+
+
+@font-face {
     font-family: PlexesProBook;
-    src: url('plexespro-book.eot');
-    src: url('plexespro-book.eot') format('embedded-opentype'),
-         url('plexespro-book.woff2') format('woff2'),
-         url('plexespro-book.woff') format('woff'),
-         url('plexespro-book.ttf') format('truetype'),
-         url('plexespro-book.svg#PlexesProBook') format('svg');
+    src: url('fontz/plexespro-book.eot');
+    src: url('fontz/plexespro-book.eot') format('embedded-opentype'),
+         url('fontz/plexespro-book.woff2') format('woff2'),
+         url('fontz/plexespro-book.woff') format('woff'),
+         url('fontz/plexespro-book.ttf') format('truetype'),
+         url('fontz/plexespro-book.svg#PlexesProBook') format('svg');
 }
 
 
 @font-face {
     font-family: PlexesProLightItalic;
-    src: url('plexespro-lightitalic.eot');
-    src: url('plexespro-lightitalic.eot') format('embedded-opentype'),
-         url('plexespro-lightitalic.woff2') format('woff2'),
-         url('plexespro-lightitalic.woff') format('woff'),
-         url('plexespro-lightitalic.ttf') format('truetype'),
-         url('plexespro-lightitalic.svg#PlexesProLightItalic') format('svg');
+    src: url('fontz/plexespro-lightitalic.eot');
+    src: url('fontz/plexespro-lightitalic.eot') format('embedded-opentype'),
+         url('fontz/plexespro-lightitalic.woff2') format('woff2'),
+         url('fontz/plexespro-lightitalic.woff') format('woff'),
+         url('fontz/plexespro-lightitalic.ttf') format('truetype'),
+         url('fontz/plexespro-lightitalic.svg#PlexesProLightItalic') format('svg');
 }
 
 @font-face {
     font-family: PlexesProLight;
-    src: url('plexespro-lt.eot');
-    src: url('plexespro-lt.eot') format('embedded-opentype'),
-         url('plexespro-lt.woff2') format('woff2'),
-         url('plexespro-lt.woff') format('woff'),
-         url('plexespro-lt.ttf') format('truetype'),
-         url('plexespro-lt.svg#PlexesProLight') format('svg');
+    src: url('fontz/plexespro-lt.eot');
+    src: url('fontz/plexespro-lt.eot') format('embedded-opentype'),
+         url('fontz/plexespro-lt.woff2') format('woff2'),
+         url('fontz/plexespro-lt.woff') format('woff'),
+         url('fontz/plexespro-lt.ttf') format('truetype'),
+         url('fontz/plexespro-lt.svg#PlexesProLight') format('svg');
 }
 
 
@@ -152,6 +158,7 @@ body {
 	height: 20px;
 	width: 130px;
 	padding-left: 50px;
+  font-family: Bebas;
 }
 
 #popUp1member {
@@ -286,7 +293,7 @@ body,
 #site-slogan,
 .ui-widget,
 .comment-form label {
-  font-family: Georgia, "Times New Roman", Times, serif;
+  font-family: "PlexesProLight", Georgia, "Times New Roman", Times, serif;
 }
 #header,
 #footer-wrapper,
@@ -1843,6 +1850,7 @@ body {
 #headerSS {
 	display: inline-block;
 	width: 100%;
+  margin-top: 30px;
 }
 
 #headerLogo {
@@ -1861,10 +1869,11 @@ body {
 #headerHash {
 	font-size: 22px;
 	color: #B21422;
-	margin-left: 350px;
+	margin-left: 305px;
+  margin-bottom: -20px;
 	
 	
-    	font-family: PlexesProLightItalic;
+    	font-family: PlexesProLight;
 	
 }
 
@@ -1880,67 +1889,77 @@ body {
 }
 
 #podHeader {
+  margin-top: -20px;
 
 }
 
 #podHeaderTeks {
-	margin-left: 270px;
-	margin-top: 120px;
+	margin-left: 390px;
+	margin-top: 102px;
 }
 
 #TeksBel {
 	color: white;
+  font-family: bebas;
 }
 
 #TeksZut {
-	color: yellow;
+	color: #e4a92a;
 	margin-top: -20px;
 }
 
 #TeksBel .golemo, #TeksZut .golemo{
-	font-size: 30px;
+	font-size: 40px;
 	line-height: 30px;
+  font-family: bebas;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
 }
 
 #TeksBel p, #TeksZut p {
-	font-size: 22px;
+	font-size: 29px;
 	line-height: 20px;
+  font-family: "PlexesProLight";
 }
-
+#nubeBlanca{
+  margin-top: -60px;
+}
 #podHeaderBelo {
 	position: absolute;
 	background-image: url('http://chelik.org:60080/ma/drupal/sites/default/files/sliki/sliki/pleca-blanca.png');
-	background-size: 100%;
+	background-size: 90%;
 	background-repeat: no-repeat;
 	width: 100%;
 	height: 220px;
-	top: 330px;
+	top: 290px;
 	#top: 55%;
 	z-index: 0;
+  right: -70px;
+  margin-top:45px;
 	
 }
 #podHeaderPoklonchinja {
 	position: absolute;
-	right: 70px;
-	top: 250px;
+	right: 290px;
+	top: 260px;
 }
 
 #podHeaderLogo {
 	position: absolute;
 	#left: 270px;
-	left: 20%;
-	top: 370px;
+	left: 320px;
+	top: 380px;
 }
 
 
 #homeContainer {
 	width: 780px;
-	background: pink;
+	background: #e3d1c0;
 	height: 1600px;
 	margin: auto;
 	padding-left: 82px;
 	border: 5px #B21422 solid;
-	margin-top: 100px;
+	margin-top: 120px;
 }
 
 
@@ -1972,28 +1991,34 @@ body {
 #homeGoreL1 {
 	color: #B21422;
 	margin-top: 20px;
-	font-size: 27px;
-	
+  font-size: 31px;
+	line-height: 36px;
+	font-family: PlexesProBook;
+
 	z-index:2;
 }
 
 #homeGoreL2 {
 	color: #B21422;
-	font-size: 22px;
+	font-size: 20px;
+  line-height: 24px;
 	margin-top: 64px;
+  font-family: PlexesProLightItalic;
+  margin-top: 50px;
 }
 
 #homeGoreD1 {
 	border-bottom: 1px #B21422 dashed;
 	color: #B21422;
 	margin-top: 20px;
-	font-size: 22px;
-	
+  font-size: 23px;
+	line-height: 23px;
+	font-family: PlexesProLightItalic;
 	z-index:2;
 }
 
 #homeGoreD2 {
-	margin-top: 34px;
+	margin-top: 15px;
 }
 
 #homeGoreD2 .dropdownMF {
@@ -2005,10 +2030,11 @@ body {
 }
 
 #homeGoreDKopche {
-	margin-top: 20px;
-	margin-left: 35px;
-	padding-left: 50px;
+	margin-top: 50px;
+	margin-left: 60px;
+	/*padding-left: 50px;*/
 	width: 90px;
+  font-family: Bebas;
 }
 
 #homeGoreDKopche2 {
@@ -2035,26 +2061,32 @@ body {
 #homePoklonchinjaSlika {
 	float: left;
 }
+#homePoklonchinjaSlika img{margin-left: 10px;}
 
 #homePoklonchinjaDr {
-	margin-left: 270px;
-	width: 420px;
+	margin-left: 345px;
+	width: 370px;
 	color: white;
 }
 
 #homePoklonchinjaDr h1 {
-	font-size: 27px;
+	font-size: 36px;
+  font-family: Bebas;
+  color:#fff;
+  margin: 0.2em 0 0;
 }
 
 #homePoklonchinjaDr p {
-	font-size: 20px;
-	margin-top: -20px;
+	font-size: 22px;
+  line-height: 22px;
+	margin-top: -10px;
 }
 
 #homePoklonchinjaKopche {
 	width: 140px;
-	margin-left: 200px;
-	margin-top: -30px;
+	margin-left: 125px;
+	margin-top:-40px;
+  font-family: Bebas;
 }
 
 
@@ -2074,6 +2106,7 @@ body {
 	margin-left: 48px;
 	color: #991b26;
 	font-size: 30px;
+  font-family: Bebas;
 	
 }
 
@@ -2089,6 +2122,7 @@ body {
 	z-index: 1;
 	position: relative;
 	margin-top: 10px;
+  font-family: PlexesProLightItalic;
 }
 
 #homeBlock1Slika {
@@ -2103,6 +2137,7 @@ body {
 	width: 160px;
 	margin-left: 65px;
 	margin-top: 5px;
+  font-family: Bebas;
 }
 
 .kopche, .kopche:hover, .kopche:visited {
@@ -2110,10 +2145,11 @@ body {
   	-moz-border-radius: 28;
   	border-radius: 28px;
   	color: #ffffff;
-  	font-size: 16px;
+  	font-size: 22px;
   	background: #ffaa00;
-  	padding: 10px 20px 10px 20px;
+  	padding: 5px 20px;
   	text-decoration: none;
+    text-align: center;
 }
 
 .kopche a, .kopche a:hover {
@@ -2134,6 +2170,7 @@ body {
 	padding-top: 26px;
 	margin-left: 26px;
 	display: inline-block;
+  font-family: PlexesProLightItalic;
 }
 
 #homeBlok2tekstovi {
@@ -2157,6 +2194,7 @@ body {
 	font-size: 20px;
 	margin-left: 26px;
 	margin-top: 2px;
+  font-family: PlexesProLightItalic;
 }
 
 .triagolnik {
@@ -2177,11 +2215,12 @@ float: right;
   color: #ffffff;
   font-size: 16px;
   background: #BBB;
-  #padding: 5px 10px 5px 10px;
+  /*padding: 5px 10px 5px 10px;*/
   text-decoration: none;
   height: 30px;
   width: 250px;
   margin-top: 10px;
+  font-family: Bebas;
   
 }
 
@@ -2210,6 +2249,7 @@ float: right;
 	background: #fff;
 	border: 1px solid black;
 	margin-top: 35px;
+  font-family: Bebas;
 	
 }
 
@@ -2293,7 +2333,7 @@ padding-left: 100px;
 
 #homeGoreD1 a {
 	text-decoration: none;
-	color: darkred;
+	color: #B21422;
 }
 
 //recommendations!!!!!
@@ -2389,6 +2429,7 @@ padding-left: 100px;
 	margin-top: 20px;
 	margin-left: 150px;
 	width: 270px;
+  font-family: Bebas;
 }
 
 #msgDole {
@@ -2424,6 +2465,7 @@ padding-left: 100px;
 	margin-top: 20px;
 	margin-left: 150px;
 	width: 270px;
+  font-family: Bebas;
 }
 
 
