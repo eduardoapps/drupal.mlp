@@ -217,8 +217,8 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'regalo',
-      'username' => 'regalo',
+      'database' => 'git.regalo',
+      'username' => 'git.regalo',
       'password' => '1234',
       'host' => 'localhost',
       'port' => '',
